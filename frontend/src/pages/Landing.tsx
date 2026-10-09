@@ -116,7 +116,7 @@ const CareerOrbit = memo(() => {
       whileInView="visible"
       viewport={{ once: true }}
       transition={{ delay: 0.4 }}
-      className="orbit-container relative w-[320px] h-[320px] sm:w-[440px] sm:h-[440px] lg:w-[480px] lg:h-[480px] mx-auto lg:ml-auto lg:mr-0 flex items-center justify-center select-none"
+      className="orbit-container relative w-[320px] h-[320px] sm:w-[440px] sm:h-[440px] lg:w-[480px] lg:h-[480px] mx-auto lg:ml-auto lg:mr-0 flex items-center justify-center select-none mb-10 lg:mb-0"
     >
       {/* Central Ambient Energy Glow */}
       <div className="absolute w-48 h-48 rounded-full bg-brand/20 blur-[60px] pointer-events-none" />
@@ -137,14 +137,16 @@ const CareerOrbit = memo(() => {
       {/* Central AI Core Hub */}
       <div className="relative z-20 flex flex-col items-center justify-center pointer-events-none">
         {/* Pulsing Outer Energy Wave */}
-        <div
+        <motion.div
+          animate={{ scale: [0.95, 1.15, 0.95], opacity: [0.8, 0.2, 0.8] }}
+          transition={{ duration: 3.5, repeat: Infinity, ease: 'easeOut' }}
           className="absolute w-28 h-28 sm:w-32 sm:h-32 rounded-full border border-ai-cyan/30"
-          style={prefersReducedMotion ? undefined : { animation: 'pulse-ring 3.5s ease-out infinite' }}
         />
         {/* Rotating Dashed Compass Ring */}
-        <div
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 24, repeat: Infinity, ease: 'linear' }}
           className="absolute w-24 h-24 sm:w-28 sm:h-28 rounded-full border border-dashed border-ai-cyan/25"
-          style={prefersReducedMotion ? undefined : { animation: 'radar-sweep 24s linear infinite' }}
         />
         {/* Core Hub Center */}
         <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#0A0A0F]/95 border border-brand/45 flex flex-col items-center justify-center shadow-[0_0_35px_rgba(91,124,250,0.35)] backdrop-blur-xl">
@@ -157,13 +159,13 @@ const CareerOrbit = memo(() => {
 
       {/* Orbiting Inner Ring Chips */}
       {ORBIT_INNER_CHIPS.map((chip) => (
-        <OrbitChip key={chip.label} {...chip} prefersReducedMotion={prefersReducedMotion} />
+        <OrbitChip key={chip.label} {...chip} />
       ))}
 
       {/* Orbiting Outer Ring Chips (Desktop & Tablet) */}
       <div className="hidden sm:contents">
         {ORBIT_OUTER_CHIPS.map((chip) => (
-          <OrbitChip key={chip.label} {...chip} prefersReducedMotion={prefersReducedMotion} />
+          <OrbitChip key={chip.label} {...chip} />
         ))}
       </div>
 
@@ -196,8 +198,7 @@ function OrbitChip({
   reverse,
   categoryColor,
   icon: Icon,
-  prefersReducedMotion,
-}: OrbitChipData & { prefersReducedMotion?: boolean | null }) {
+}: OrbitChipData) {
   const animationDelay = reverse
     ? `-${(((360 - angle) % 360) / 360) * 38}s`
     : `-${(angle / 360) * 28}s`;
@@ -207,18 +208,9 @@ function OrbitChip({
       className={`absolute top-1/2 left-1/2 pointer-events-auto ${
         reverse ? 'orbit-chip-outer' : 'orbit-chip-inner'
       }`}
-      style={
-        prefersReducedMotion
-          ? {
-              transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(var(${
-                reverse ? '--orbit-r, -205px' : '--orbit-r, -145px'
-              })) rotate(-${angle}deg)`,
-              animation: 'none',
-            }
-          : {
-              animationDelay,
-            }
-      }
+      style={{
+        animationDelay,
+      }}
     >
       <div
         className="group relative flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0A0A0F]/95 border border-white/[0.12] hover:border-white/40 backdrop-blur-md whitespace-nowrap shadow-[0_4px_16px_rgba(0,0,0,0.5)] transition-all duration-200 hover:scale-110 cursor-pointer"
@@ -465,7 +457,7 @@ export function Landing() {
           />
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10 flex flex-col lg:flex-row items-center gap-10 lg:gap-14">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10 flex flex-col lg:flex-row items-center gap-6 lg:gap-14">
           <div className="flex-1 text-center lg:text-left">
             <motion.div
               initial={{ opacity: 0, y: 10 }}
@@ -481,8 +473,8 @@ export function Landing() {
                 Free AI Career Counseling Platform
               </span>
             </motion.div>
-            <h1 className="font-anton text-[clamp(2.4rem,5.5vw,4.2rem)] leading-[1.08] tracking-wider text-text-primary mb-5">
-              Empathetic AI Mentorship & Custom Roadmaps for Students
+            <h1 className="font-plus-jakarta font-semibold text-[clamp(2rem,6vw,4.2rem)] leading-[1.08] tracking-tight text-text-primary mb-5">
+              Empathetic AI Mentorship for Students
             </h1>
             <p className="text-base sm:text-lg text-text-secondary mb-7 max-w-xl mx-auto lg:mx-0 leading-relaxed font-normal">
               Unlock personalized path recommendations based on academic strengths and interests. Created exclusively for Indian Class 10 & 12 students.
@@ -544,7 +536,7 @@ export function Landing() {
                   idx % 2 === 0 ? 'md:border-none' : ''
                 } ${idx >= 2 ? 'md:border-l' : ''}`}
               >
-                <div className="font-anton text-2xl sm:text-3xl text-brand tracking-wider mb-2">
+                <div className="font-plus-jakarta font-bold text-2xl sm:text-3xl text-brand tracking-tight mb-2">
                   <AnimatedCounter to={stat.value} suffix={stat.suffix} />
                 </div>
                 <div className="text-text-secondary text-xs sm:text-sm text-center font-medium">
@@ -559,7 +551,7 @@ export function Landing() {
       {/* ── JOURNEY ── */}
       <section id="journey" className="py-24 relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <SectionReveal className="text-center mb-16">
-          <h2 className="font-anton text-[clamp(2rem,5vw,3.5rem)] text-text-primary tracking-wide">
+          <h2 className="font-plus-jakarta font-bold text-[clamp(2rem,5vw,3.5rem)] text-text-primary tracking-tight">
             THE GUIDANCE JOURNEY
           </h2>
         </SectionReveal>
@@ -626,7 +618,7 @@ export function Landing() {
       {/* ── LIVE INTERACTIVE PIPELINE (Student → AI → Recommendation → Roadmap) ── */}
       <section id="preview" className="py-24 relative z-10 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto border-t border-white/[0.06]">
         <SectionReveal className="text-center mb-12">
-          <h2 className="font-anton text-[clamp(2rem,5vw,3.5rem)] text-text-primary tracking-wide mb-4">
+          <h2 className="font-plus-jakarta font-bold text-[clamp(2rem,5vw,3.5rem)] text-text-primary tracking-tight mb-4">
             HOW IT WORKS
           </h2>
           <p className="text-text-secondary text-base sm:text-lg max-w-2xl mx-auto">
@@ -724,7 +716,7 @@ export function Landing() {
                   <div className="bg-white/[0.03] border border-white/[0.06] rounded-[18px] p-5 space-y-4">
                     <div className="flex items-start gap-3">
                       <div className="w-8 h-8 rounded-full bg-brand/10 flex items-center justify-center shrink-0">
-                        <span className="font-anton text-brand text-xs">AI</span>
+                        <span className="font-plus-jakarta font-bold text-brand text-xs tracking-tight">AI</span>
                       </div>
                       <p className="text-sm text-text-primary leading-relaxed">
                         "Based on your Class 12 PCM stream, the Academic Suitability score is highly aligned. Your passion for visual design matches interest vectors in digital production and human-centered technology. I am scoring 150+ paths..."
@@ -754,7 +746,7 @@ export function Landing() {
                       <span className="text-xs text-text-secondary uppercase font-semibold">Top Recommendation Match</span>
                       <h4 className="text-2xl font-bold text-text-primary mt-1">UX DESIGNER</h4>
                     </div>
-                    <div className="text-2xl font-anton text-brand">94% MATCH</div>
+                    <div className="text-2xl font-plus-jakarta font-bold tracking-tight text-brand">94% MATCH</div>
                   </div>
                   <div className="w-full h-2.5 bg-white/[0.05] rounded-full overflow-hidden mb-6">
                     <div className="h-full bg-brand rounded-full" style={{ width: '94%' }} />
@@ -814,7 +806,7 @@ export function Landing() {
       {/* ── CAREER UNIVERSE ── */}
       <section id="careers" className="py-24 relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <SectionReveal className="text-center mb-16">
-          <h2 className="font-anton text-[clamp(2rem,5vw,3.5rem)] text-text-primary tracking-wide mb-4">
+          <h2 className="font-plus-jakarta font-bold text-[clamp(2rem,5vw,3.5rem)] text-text-primary tracking-tight mb-4">
             CAREER CATALOG
           </h2>
           <p className="text-text-secondary text-base sm:text-lg max-w-2xl mx-auto">
@@ -839,7 +831,7 @@ export function Landing() {
       {/* ── WHY SCPR (Asymmetric Feature Grid) ── */}
       <section className="py-24 relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/[0.06]">
         <SectionReveal className="text-center mb-16">
-          <h2 className="font-anton text-[clamp(2rem,5vw,3.5rem)] text-text-primary tracking-wide">
+          <h2 className="font-plus-jakarta font-bold text-[clamp(2rem,5vw,3.5rem)] text-text-primary tracking-tight">
             DESIGNED FOR SUCCESS
           </h2>
         </SectionReveal>
@@ -878,7 +870,7 @@ export function Landing() {
       <section className="py-24 relative z-10 overflow-hidden border-t border-white/[0.06]">
         <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
           <SectionReveal className="text-center mb-16">
-            <h2 className="font-anton text-[clamp(2rem,5vw,3.5rem)] text-text-primary tracking-wide mb-4">
+            <h2 className="font-plus-jakarta font-bold text-[clamp(2rem,5vw,3.5rem)] text-text-primary tracking-tight mb-4">
               STUDENT STORIES
             </h2>
             <p className="text-text-secondary text-base sm:text-lg">
@@ -905,7 +897,7 @@ export function Landing() {
       {/* ── ABOUT ── */}
       <section id="about" className="py-24 relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/[0.06]">
         <SectionReveal className="text-center mb-16">
-          <h2 className="font-anton text-[clamp(2rem,5vw,3.5rem)] text-text-primary tracking-wide mb-6">
+          <h2 className="font-plus-jakarta font-bold text-[clamp(2rem,5vw,3.5rem)] text-text-primary tracking-tight mb-6">
             ABOUT SCPR
           </h2>
           <p className="text-text-secondary text-base sm:text-lg max-w-3xl mx-auto leading-relaxed">
@@ -939,7 +931,7 @@ export function Landing() {
       {/* ── CTA ── */}
       <section className="relative min-h-[50vh] flex flex-col items-center justify-center py-24 overflow-hidden border-t border-white/[0.06]">
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto w-full">
-          <h2 className="font-anton text-[clamp(2.5rem,8vw,5rem)] uppercase text-text-primary leading-[1.1] tracking-wider mb-6">
+          <h2 className="font-plus-jakarta font-bold text-[clamp(2.5rem,8vw,5rem)] uppercase text-text-primary leading-[1.1] tracking-tight mb-6">
             BEGIN YOUR PATH FINDING
           </h2>
           <p className="text-text-secondary text-base sm:text-lg mb-10 max-w-xl mx-auto">
@@ -1127,7 +1119,7 @@ function CareerCardInline({
       >
         <div className="flex flex-col h-full justify-between">
           <div>
-            <h3 className="font-anton text-[1.3rem] tracking-wide mb-4" style={{ color }}>
+            <h3 className="font-plus-jakarta font-bold text-[1.3rem] tracking-tight mb-4" style={{ color }}>
               {title}
             </h3>
             <div className="space-y-3 mb-6">
