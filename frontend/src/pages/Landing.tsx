@@ -28,6 +28,15 @@ import {
   Mail,
   ArrowRight,
   Eye,
+  Code2,
+  Activity,
+  Palette,
+  Award,
+  Cpu,
+  Compass,
+  Layers,
+  Shield,
+  Lock,
 } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { GlassCard } from '../components/ui/GlassCard';
@@ -74,6 +83,30 @@ function AnimatedCounter({
 }
 
 /* ── CareerOrbit ────────────────────────────────── */
+interface OrbitChipData {
+  label: string;
+  angle: number;
+  reverse?: boolean;
+  categoryColor: string;
+  icon: typeof Brain;
+}
+
+const ORBIT_INNER_CHIPS: OrbitChipData[] = [
+  { label: 'Software Engineer', angle: 0, categoryColor: '#3B82F6', icon: Code2 },
+  { label: 'Medical Researcher', angle: 60, categoryColor: '#22C55E', icon: Activity },
+  { label: 'UX Designer', angle: 120, categoryColor: '#F97316', icon: Palette },
+  { label: 'IAS Officer', angle: 180, categoryColor: '#94A3B8', icon: Award },
+  { label: 'Data Scientist', angle: 240, categoryColor: '#8B5CF6', icon: Cpu },
+  { label: 'Pilot', angle: 300, categoryColor: '#EF4444', icon: Compass },
+];
+
+const ORBIT_OUTER_CHIPS: OrbitChipData[] = [
+  { label: 'Architect', angle: 0, categoryColor: '#06B6D4', icon: Layers, reverse: true },
+  { label: 'Defense Officer', angle: 90, categoryColor: '#DC2626', icon: Shield, reverse: true },
+  { label: 'Cybersecurity', angle: 180, categoryColor: '#3B82F6', icon: Lock, reverse: true },
+  { label: 'Creative Director', angle: 270, categoryColor: '#EC4899', icon: Sparkles, reverse: true },
+];
+
 const CareerOrbit = memo(() => {
   const prefersReducedMotion = useReducedMotion();
   return (
@@ -83,60 +116,124 @@ const CareerOrbit = memo(() => {
       whileInView="visible"
       viewport={{ once: true }}
       transition={{ delay: 0.4 }}
-      className="relative w-[300px] h-[300px] md:w-[420px] md:h-[420px] mx-auto lg:ml-auto lg:mr-0 flex items-center justify-center pointer-events-none"
+      className="orbit-container relative w-[320px] h-[320px] sm:w-[440px] sm:h-[440px] lg:w-[480px] lg:h-[480px] mx-auto lg:ml-auto lg:mr-0 flex items-center justify-center select-none"
     >
-      <div className="relative z-10 w-20 h-20 md:w-24 md:h-24 rounded-full bg-[#0A0A0F] border border-white/[0.08] flex items-center justify-center shadow-xl">
-        <Brain className="h-10 w-10 text-brand" />
-      </div>
+      {/* Central Ambient Energy Glow */}
+      <div className="absolute w-48 h-48 rounded-full bg-brand/20 blur-[60px] pointer-events-none" />
+
+      {/* Orbit Track 1 (Inner) - Static circular guide */}
       <div
-        className="absolute inset-0 border border-white/[0.05] rounded-full"
-        style={prefersReducedMotion ? undefined : { animation: 'orbit 25s linear infinite' }}
-      >
-        {[
-          { label: 'Software Engineer', angle: 0 },
-          { label: 'Medical Researcher', angle: 60 },
-          { label: 'UX Designer', angle: 120 },
-          { label: 'IAS Officer', angle: 180 },
-          { label: 'Data Scientist', angle: 240 },
-          { label: 'Pilot', angle: 300 },
-        ].map((c) => (
-          <OrbitChip key={c.label} {...c} />
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[240px] h-[240px] sm:w-[290px] sm:h-[290px] rounded-full border border-brand/20 pointer-events-none"
+        style={{
+          boxShadow: 'inset 0 0 24px rgba(91, 124, 250, 0.08), 0 0 20px rgba(91, 124, 250, 0.05)',
+        }}
+      />
+
+      {/* Orbit Track 2 (Outer) - Static dashed guide */}
+      <div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] h-[340px] sm:w-[410px] sm:h-[410px] rounded-full border border-dashed border-white/[0.08] pointer-events-none hidden sm:block"
+      />
+
+      {/* Central AI Core Hub */}
+      <div className="relative z-20 flex flex-col items-center justify-center pointer-events-none">
+        {/* Pulsing Outer Energy Wave */}
+        <div
+          className="absolute w-28 h-28 sm:w-32 sm:h-32 rounded-full border border-ai-cyan/30"
+          style={prefersReducedMotion ? undefined : { animation: 'pulse-ring 3.5s ease-out infinite' }}
+        />
+        {/* Rotating Dashed Compass Ring */}
+        <div
+          className="absolute w-24 h-24 sm:w-28 sm:h-28 rounded-full border border-dashed border-ai-cyan/25"
+          style={prefersReducedMotion ? undefined : { animation: 'radar-sweep 24s linear infinite' }}
+        />
+        {/* Core Hub Center */}
+        <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#0A0A0F]/95 border border-brand/45 flex flex-col items-center justify-center shadow-[0_0_35px_rgba(91,124,250,0.35)] backdrop-blur-xl">
+          <Brain className="h-8 w-8 sm:h-9 sm:w-9 text-brand drop-shadow-[0_0_12px_rgba(91,124,250,0.8)]" />
+          <span className="text-[9px] font-mono tracking-widest text-ai-cyan font-semibold mt-1">
+            AI CORE
+          </span>
+        </div>
+      </div>
+
+      {/* Orbiting Inner Ring Chips */}
+      {ORBIT_INNER_CHIPS.map((chip) => (
+        <OrbitChip key={chip.label} {...chip} prefersReducedMotion={prefersReducedMotion} />
+      ))}
+
+      {/* Orbiting Outer Ring Chips (Desktop & Tablet) */}
+      <div className="hidden sm:contents">
+        {ORBIT_OUTER_CHIPS.map((chip) => (
+          <OrbitChip key={chip.label} {...chip} prefersReducedMotion={prefersReducedMotion} />
         ))}
       </div>
-      <div
-        className="absolute inset-[-40px] md:inset-[-60px] border border-white/[0.03] rounded-full hidden sm:block"
-        style={prefersReducedMotion ? undefined : { animation: 'orbit-reverse 35s linear infinite' }}
+
+      {/* Floating Live Match Insight Badge */}
+      <motion.div
+        animate={prefersReducedMotion ? {} : { y: [0, -6, 0] }}
+        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+        className="absolute -bottom-8 sm:-bottom-10 left-1/2 -translate-x-1/2 sm:left-2 sm:translate-x-0 z-30 pointer-events-auto"
       >
-        {[
-          { label: 'Architect', angle: 0 },
-          { label: 'Defense Officer', angle: 90 },
-          { label: 'Cybersecurity', angle: 180 },
-          { label: 'Creative Director', angle: 270 },
-        ].map((c) => (
-          <OrbitChip key={c.label} {...c} reverse />
-        ))}
-      </div>
+        <div className="flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-[#0A0A0F]/95 border border-brand/35 backdrop-blur-md shadow-[0_8px_25px_rgba(0,0,0,0.7)]">
+          <div className="w-6 h-6 rounded-lg bg-brand/15 border border-brand/30 flex items-center justify-center text-brand">
+            <Sparkles className="h-3.5 w-3.5 text-ai-cyan" />
+          </div>
+          <div className="flex flex-col text-left">
+            <div className="text-[10px] text-text-muted font-medium">Smart AI Matching</div>
+            <div className="text-xs font-semibold text-text-primary flex items-center gap-1.5">
+              <span>96% Pathway Match</span>
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400" />
+            </div>
+          </div>
+        </div>
+      </motion.div>
     </motion.div>
   );
 });
 
-function OrbitChip({ label, angle, reverse }: { label: string; angle: number; reverse?: boolean }) {
+function OrbitChip({
+  label,
+  angle,
+  reverse,
+  categoryColor,
+  icon: Icon,
+  prefersReducedMotion,
+}: OrbitChipData & { prefersReducedMotion?: boolean | null }) {
+  const animationDelay = reverse
+    ? `-${(((360 - angle) % 360) / 360) * 38}s`
+    : `-${(angle / 360) * 28}s`;
+
   return (
     <div
-      className="absolute top-1/2 left-1/2 pointer-events-auto"
-      style={{
-        transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(-50%) translateY(${
-          reverse ? '-220px' : '-160px'
-        })`,
-      }}
+      className={`absolute top-1/2 left-1/2 pointer-events-auto ${
+        reverse ? 'orbit-chip-outer' : 'orbit-chip-inner'
+      }`}
+      style={
+        prefersReducedMotion
+          ? {
+              transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(var(${
+                reverse ? '--orbit-r, -205px' : '--orbit-r, -145px'
+              })) rotate(-${angle}deg)`,
+              animation: 'none',
+            }
+          : {
+              animationDelay,
+            }
+      }
     >
       <div
-        className={reverse ? 'chip-counter-rotate-reverse' : 'chip-counter-rotate'}
-        style={{ animationDelay: `-${(angle / 360) * (reverse ? 35 : 25)}s` }}
+        className="group relative flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0A0A0F]/95 border border-white/[0.12] hover:border-white/40 backdrop-blur-md whitespace-nowrap shadow-[0_4px_16px_rgba(0,0,0,0.5)] transition-all duration-200 hover:scale-110 cursor-pointer"
+        style={{
+          borderColor: `${categoryColor}50`,
+        }}
       >
-        <div className="px-3.5 py-1.5 rounded-full bg-white/[0.05] border border-white/[0.08] backdrop-blur-md whitespace-nowrap shadow-sm">
-          <span className="text-[0.7rem] font-semibold text-text-secondary">{label}</span>
-        </div>
+        <span
+          className="w-1.5 h-1.5 rounded-full shrink-0 transition-transform group-hover:scale-125"
+          style={{ backgroundColor: categoryColor, boxShadow: `0 0 8px ${categoryColor}` }}
+        />
+        <Icon className="h-3 w-3 shrink-0" style={{ color: categoryColor }} />
+        <span className="text-[0.72rem] font-medium text-text-primary group-hover:text-white transition-colors">
+          {label}
+        </span>
       </div>
     </div>
   );
@@ -346,44 +443,91 @@ export function Landing() {
         )}
       </AnimatePresence>
 
-      {/* ── HERO (Largest aurora background intensity) ── */}
-      <section className="relative min-h-screen flex items-center pt-24 pb-12 overflow-hidden bg-[#05070D]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10 flex flex-col lg:flex-row items-center gap-12">
+      {/* ── HERO (Enhanced aurora ambient lighting & depth) ── */}
+      <section className="relative min-h-[92vh] lg:min-h-screen flex items-center pt-24 lg:pt-28 pb-12 lg:pb-16 overflow-hidden bg-[#05070D]">
+        {/* Ambient Aurora Glows */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          {/* Top-Right Cyan/Brand Aurora */}
+          <div className="absolute -top-[10%] right-[-5%] w-[620px] h-[620px] rounded-full bg-[radial-gradient(circle_at_center,rgba(91,124,250,0.18)_0%,rgba(112,225,255,0.08)_40%,transparent_70%)] blur-[90px]" />
+          {/* Center-Left Violet/Indigo Glow */}
+          <div className="absolute top-[20%] -left-[10%] w-[560px] h-[560px] rounded-full bg-[radial-gradient(circle_at_center,rgba(139,92,246,0.14)_0%,rgba(91,124,250,0.06)_45%,transparent_70%)] blur-[100px]" />
+          {/* Subtle Center Depth Beam */}
+          <div className="absolute top-[35%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(91,124,250,0.08)_0%,transparent_70%)] blur-[110px]" />
+          {/* Fine Technical Grid with Radial Vignette Falloff */}
+          <div
+            className="absolute inset-0 opacity-[0.035]"
+            style={{
+              backgroundImage: 'radial-gradient(rgba(255, 255, 255, 0.9) 1px, transparent 1px)',
+              backgroundSize: '36px 36px',
+              maskImage: 'radial-gradient(ellipse 70% 60% at 50% 40%, black 30%, transparent 80%)',
+              WebkitMaskImage: 'radial-gradient(ellipse 70% 60% at 50% 40%, black 30%, transparent 80%)',
+            }}
+          />
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10 flex flex-col lg:flex-row items-center gap-10 lg:gap-14">
           <div className="flex-1 text-center lg:text-left">
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="inline-block px-3.5 py-1 mb-6 rounded-full border border-brand/25 bg-brand/5 backdrop-blur-md"
+              className="inline-flex items-center gap-2 px-4 py-1.5 mb-5 rounded-full border border-brand/30 bg-brand/10 backdrop-blur-md shadow-[0_0_20px_rgba(91,124,250,0.15)]"
             >
-              <span className="text-[0.7rem] sm:text-xs font-semibold tracking-wider text-brand uppercase">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-ai-cyan opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-ai-cyan" />
+              </span>
+              <span className="text-[0.72rem] sm:text-xs font-semibold tracking-wider text-brand uppercase">
                 Free AI Career Counseling Platform
               </span>
             </motion.div>
-            <h1 className="font-anton text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.1] tracking-wider text-text-primary mb-6">
+            <h1 className="font-anton text-[clamp(2.4rem,5.5vw,4.2rem)] leading-[1.08] tracking-wider text-text-primary mb-5">
               Empathetic AI Mentorship & Custom Roadmaps for Students
             </h1>
-            <p className="text-base sm:text-lg text-text-secondary mb-10 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+            <p className="text-base sm:text-lg text-text-secondary mb-7 max-w-xl mx-auto lg:mx-0 leading-relaxed font-normal">
               Unlock personalized path recommendations based on academic strengths and interests. Created exclusively for Indian Class 10 & 12 students.
             </p>
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5, duration: 0.35 }}
-              className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4"
+              className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-6"
             >
-              <Button size="lg" onClick={() => navigate('/register')} className="w-full sm:w-auto px-8 text-base">
-                Start Assessment <ArrowRight className="h-4 w-4 ml-1" />
+              <Button
+                size="lg"
+                onClick={() => navigate('/register')}
+                className="w-full sm:w-auto px-8 py-3.5 text-base font-semibold shadow-[0_0_30px_rgba(91,124,250,0.35)] hover:shadow-[0_0_40px_rgba(91,124,250,0.55)] transition-all duration-300"
+              >
+                Start Assessment <ArrowRight className="h-4 w-4 ml-1.5" />
               </Button>
               <a
                 href="#careers"
-                className="w-full sm:w-auto font-semibold text-text-primary bg-white/[0.05] border border-white/[0.08] px-8 py-3.5 rounded-[18px] hover:bg-white/[0.12] hover:border-white/[0.12] transition-colors flex items-center justify-center gap-2 text-base focus-ring"
+                className="w-full sm:w-auto font-semibold text-text-primary bg-white/[0.04] border border-white/[0.12] hover:border-brand/40 hover:bg-white/[0.08] px-8 py-3.5 rounded-[18px] transition-all duration-300 flex items-center justify-center gap-2 text-base focus-ring backdrop-blur-sm"
               >
                 Explore Careers <Eye className="h-4 w-4" />
               </a>
             </motion.div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6 }}
+              className="flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-2 text-xs text-text-muted"
+            >
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                <span>CBSE • ICSE • State Boards</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-brand" />
+                <span>150+ Career Catalog</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-ai-cyan" />
+                <span>100% Free Guidance</span>
+              </div>
+            </motion.div>
           </div>
-          <div className="flex-grow w-full lg:max-w-[45%] flex justify-center items-center">
+          <div className="flex-grow w-full lg:max-w-[48%] flex justify-center items-center">
             <CareerOrbit />
           </div>
         </div>
