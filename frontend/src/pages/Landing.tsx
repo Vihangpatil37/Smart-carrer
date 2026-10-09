@@ -443,44 +443,91 @@ export function Landing() {
         )}
       </AnimatePresence>
 
-      {/* ── HERO (Largest aurora background intensity) ── */}
-      <section className="relative min-h-screen flex items-center pt-24 pb-12 overflow-hidden bg-[#05070D]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10 flex flex-col lg:flex-row items-center gap-12">
+      {/* ── HERO (Enhanced aurora ambient lighting & depth) ── */}
+      <section className="relative min-h-[92vh] lg:min-h-screen flex items-center pt-24 lg:pt-28 pb-12 lg:pb-16 overflow-hidden bg-[#05070D]">
+        {/* Ambient Aurora Glows */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          {/* Top-Right Cyan/Brand Aurora */}
+          <div className="absolute -top-[10%] right-[-5%] w-[620px] h-[620px] rounded-full bg-[radial-gradient(circle_at_center,rgba(91,124,250,0.18)_0%,rgba(112,225,255,0.08)_40%,transparent_70%)] blur-[90px]" />
+          {/* Center-Left Violet/Indigo Glow */}
+          <div className="absolute top-[20%] -left-[10%] w-[560px] h-[560px] rounded-full bg-[radial-gradient(circle_at_center,rgba(139,92,246,0.14)_0%,rgba(91,124,250,0.06)_45%,transparent_70%)] blur-[100px]" />
+          {/* Subtle Center Depth Beam */}
+          <div className="absolute top-[35%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(91,124,250,0.08)_0%,transparent_70%)] blur-[110px]" />
+          {/* Fine Technical Grid with Radial Vignette Falloff */}
+          <div
+            className="absolute inset-0 opacity-[0.035]"
+            style={{
+              backgroundImage: 'radial-gradient(rgba(255, 255, 255, 0.9) 1px, transparent 1px)',
+              backgroundSize: '36px 36px',
+              maskImage: 'radial-gradient(ellipse 70% 60% at 50% 40%, black 30%, transparent 80%)',
+              WebkitMaskImage: 'radial-gradient(ellipse 70% 60% at 50% 40%, black 30%, transparent 80%)',
+            }}
+          />
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10 flex flex-col lg:flex-row items-center gap-10 lg:gap-14">
           <div className="flex-1 text-center lg:text-left">
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="inline-block px-3.5 py-1 mb-6 rounded-full border border-brand/25 bg-brand/5 backdrop-blur-md"
+              className="inline-flex items-center gap-2 px-4 py-1.5 mb-5 rounded-full border border-brand/30 bg-brand/10 backdrop-blur-md shadow-[0_0_20px_rgba(91,124,250,0.15)]"
             >
-              <span className="text-[0.7rem] sm:text-xs font-semibold tracking-wider text-brand uppercase">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-ai-cyan opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-ai-cyan" />
+              </span>
+              <span className="text-[0.72rem] sm:text-xs font-semibold tracking-wider text-brand uppercase">
                 Free AI Career Counseling Platform
               </span>
             </motion.div>
-            <h1 className="font-anton text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.1] tracking-wider text-text-primary mb-6">
+            <h1 className="font-anton text-[clamp(2.4rem,5.5vw,4.2rem)] leading-[1.08] tracking-wider text-text-primary mb-5">
               Empathetic AI Mentorship & Custom Roadmaps for Students
             </h1>
-            <p className="text-base sm:text-lg text-text-secondary mb-10 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+            <p className="text-base sm:text-lg text-text-secondary mb-7 max-w-xl mx-auto lg:mx-0 leading-relaxed font-normal">
               Unlock personalized path recommendations based on academic strengths and interests. Created exclusively for Indian Class 10 & 12 students.
             </p>
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5, duration: 0.35 }}
-              className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4"
+              className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-6"
             >
-              <Button size="lg" onClick={() => navigate('/register')} className="w-full sm:w-auto px-8 text-base">
-                Start Assessment <ArrowRight className="h-4 w-4 ml-1" />
+              <Button
+                size="lg"
+                onClick={() => navigate('/register')}
+                className="w-full sm:w-auto px-8 py-3.5 text-base font-semibold shadow-[0_0_30px_rgba(91,124,250,0.35)] hover:shadow-[0_0_40px_rgba(91,124,250,0.55)] transition-all duration-300"
+              >
+                Start Assessment <ArrowRight className="h-4 w-4 ml-1.5" />
               </Button>
               <a
                 href="#careers"
-                className="w-full sm:w-auto font-semibold text-text-primary bg-white/[0.05] border border-white/[0.08] px-8 py-3.5 rounded-[18px] hover:bg-white/[0.12] hover:border-white/[0.12] transition-colors flex items-center justify-center gap-2 text-base focus-ring"
+                className="w-full sm:w-auto font-semibold text-text-primary bg-white/[0.04] border border-white/[0.12] hover:border-brand/40 hover:bg-white/[0.08] px-8 py-3.5 rounded-[18px] transition-all duration-300 flex items-center justify-center gap-2 text-base focus-ring backdrop-blur-sm"
               >
                 Explore Careers <Eye className="h-4 w-4" />
               </a>
             </motion.div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6 }}
+              className="flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-2 text-xs text-text-muted"
+            >
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                <span>CBSE • ICSE • State Boards</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-brand" />
+                <span>150+ Career Catalog</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-ai-cyan" />
+                <span>100% Free Guidance</span>
+              </div>
+            </motion.div>
           </div>
-          <div className="flex-grow w-full lg:max-w-[45%] flex justify-center items-center">
+          <div className="flex-grow w-full lg:max-w-[48%] flex justify-center items-center">
             <CareerOrbit />
           </div>
         </div>
