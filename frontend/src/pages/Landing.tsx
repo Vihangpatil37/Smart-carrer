@@ -163,8 +163,8 @@ const CareerOrbit = memo(() => {
         <OrbitChip key={chip.label} {...chip} />
       ))}
 
-      {/* Orbiting Outer Ring Chips (Desktop & Tablet) */}
-      <div className="hidden sm:contents">
+      {/* Orbiting Outer Ring Chips (Desktop only) */}
+      <div className="hidden lg:contents">
         {ORBIT_OUTER_CHIPS.map((chip) => (
           <OrbitChip key={chip.label} {...chip} />
         ))}
@@ -987,30 +987,37 @@ export function Landing() {
         </motion.div>
       </section>
 
-      {/* ── STUDENT STORIES ── */}
+      {/* ── STUDENT STORIES (Seamless Right-to-Left Infinite Loop) ── */}
       <section className="py-24 relative z-10 overflow-hidden border-t border-white/[0.06]">
-        <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        {/* Soft Ambient Background Lighting */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[720px] h-[360px] bg-brand/5 blur-[120px] pointer-events-none rounded-full" />
+
+        <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative z-10">
           <SectionReveal className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-brand/25 bg-brand/10 backdrop-blur-md mb-4 text-xs font-semibold text-brand tracking-wider uppercase">
+              <Sparkles className="w-3.5 h-3.5 text-ai-cyan" />
+              <span>Student Success In Action</span>
+            </div>
             <h2 className="font-plus-jakarta font-bold text-[clamp(2rem,5vw,3.5rem)] text-text-primary tracking-tight mb-4">
               STUDENT STORIES
             </h2>
-            <p className="text-text-secondary text-base sm:text-lg">
-              Empowering students across high schools and junior colleges.
+            <p className="text-text-secondary text-base sm:text-lg max-w-2xl mx-auto">
+              Empowering students across high schools and junior colleges with clarity and confidence.
             </p>
           </SectionReveal>
         </div>
-        <div className="relative w-full max-w-[100vw] overflow-hidden group">
-          <div className="flex md:w-max overflow-x-auto snap-x snap-mandatory hide-scrollbar md:animate-scroll md:hover:[animation-play-state:paused] gap-6 px-4 md:px-0">
-            <div className="flex gap-6 shrink-0 pr-6 md:pr-0">
-              {stories.map((s, idx) => (
-                <StoryCard key={`a-${idx}`} {...s} />
-              ))}
-            </div>
-            <div className="hidden md:flex gap-6 shrink-0">
-              {stories.map((s, idx) => (
-                <StoryCard key={`b-${idx}`} {...s} />
-              ))}
-            </div>
+
+        {/* Endless Marquee Loop Right-to-Left Container */}
+        <div className="relative w-full max-w-[100vw] overflow-hidden group py-4">
+          {/* Left & Right Cinematic Vignette Fades */}
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-36 bg-gradient-to-r from-[#05070D] to-transparent z-20" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-36 bg-gradient-to-l from-[#05070D] to-transparent z-20" />
+
+          {/* Marquee Track with Dual Duplicated Sets for Perfect Infinite Motion */}
+          <div className="animate-marquee flex gap-6">
+            {[...stories, ...stories].map((s, idx) => (
+              <StoryCard key={`story-${idx}`} {...s} />
+            ))}
           </div>
         </div>
       </section>
@@ -1305,29 +1312,37 @@ function StoryCard({
   quote: string;
 }) {
   return (
-    <div className="w-[85vw] sm:w-[400px] shrink-0 snap-start">
-      <GlassCard elevation={2} className="h-full flex flex-col p-8 rounded-[24px]">
-        <div className="flex items-center gap-4 mb-6">
-          <div className="w-14 h-14 rounded-full bg-brand/10 flex items-center justify-center text-[1.8rem] shrink-0">
+    <div className="w-[300px] sm:w-[380px] shrink-0">
+      <GlassCard
+        elevation={2}
+        className="h-full flex flex-col p-7 sm:p-8 rounded-[24px] border border-white/[0.08] hover:border-brand/40 transition-all duration-300 relative group overflow-hidden bg-[#0A0A0F]/85 backdrop-blur-xl"
+      >
+        {/* Subtle Ambient Hover Glow */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-brand/10 rounded-full blur-[40px] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+        <div className="flex items-center gap-4 mb-6 relative z-10">
+          <div className="w-13 h-13 rounded-2xl bg-brand/10 border border-brand/20 flex items-center justify-center text-[1.7rem] shrink-0 shadow-[0_0_15px_rgba(91,124,250,0.15)]">
             {avatar}
           </div>
           <div>
-            <h4 className="font-semibold text-text-primary text-lg leading-tight">{name}</h4>
-            <p className="text-text-secondary text-sm">{location}</p>
+            <h4 className="font-plus-jakarta font-bold text-text-primary text-base sm:text-lg leading-tight tracking-tight">
+              {name}
+            </h4>
+            <p className="text-text-secondary text-xs sm:text-sm mt-0.5">{location}</p>
           </div>
           <div className="ml-auto">
-            <span className="px-3.5 py-1 bg-brand/10 border border-brand/20 text-brand text-[0.7rem] rounded-full uppercase tracking-wider font-semibold">
+            <span className="px-3 py-1 bg-brand/10 border border-brand/20 text-brand text-[0.68rem] font-mono rounded-full uppercase tracking-wider font-semibold">
               {stream}
             </span>
           </div>
         </div>
-        <blockquote className="flex-1 mb-8">
-          <p className="text-text-secondary text-base italic leading-relaxed">
+        <blockquote className="flex-1 mb-6 relative z-10">
+          <p className="text-text-secondary text-sm sm:text-[0.95rem] italic leading-relaxed">
             &ldquo;{quote}&rdquo;
           </p>
         </blockquote>
-        <div className="pt-4 border-t border-white/10 mt-auto">
-          <p className="text-sm text-text-secondary">
+        <div className="pt-4 border-t border-white/[0.08] mt-auto relative z-10">
+          <p className="text-xs sm:text-sm text-text-secondary">
             Recommended: <span className="text-brand font-semibold ml-1">{recommendation}</span>
           </p>
         </div>
@@ -1373,3 +1388,4 @@ function LinkedinIcon() {
     </svg>
   );
 }
+
