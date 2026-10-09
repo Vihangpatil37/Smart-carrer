@@ -244,7 +244,9 @@ export class CounselorService {
         rawMsg.includes('not valid JSON');
       const friendly = isSchemaError
         ? "I couldn't generate a structured roadmap at this time due to an unexpected AI response format. Please try rephrasing your question or ask about one of your recommended careers."
-        : rawMsg.slice(0, 1000);
+        : process.env.NODE_ENV === 'production'
+          ? "I'm having a brief connection issue with our career advisory service. Please ask your question again in a moment, or feel free to explore your recommended careers in the meantime!"
+          : rawMsg.slice(0, 1000);
       this.logger.warn(`AI call failed, returning friendly fallback: ${friendly.slice(0, 200)}`);
       const fallbackMsg = new this.messageModel({
         conversation_id: sessionId,
