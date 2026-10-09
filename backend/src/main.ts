@@ -12,12 +12,30 @@ async function bootstrap() {
   // Security headers
   app.use(helmet());
 
-  // CORS — restrict to allowed origins
-  const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:5173')
-    .split(',')
-    .map((o) => o.trim());
+  // CORS configuration for local development and cloud production
+  const corsOriginsEnv = process.env.CORS_ORIGINS;
+  const configuredOrigins = corsOriginsEnv
+    ? corsOriginsEnv.split(',').map((o) => o.trim())
+    : [];
+
   app.enableCors({
-    origin: allowedOrigins,
+    origin: (
+      origin: string | undefined,
+      callback: (err: Error | null, allow?: boolean) => void,
+    ) => {
+      if (!origin) return callback(null, true);
+      if (
+        origin.includes('localhost:') ||
+        origin.includes('127.0.0.1:') ||
+        origin.endsWith('.vercel.app') ||
+        origin.endsWith('.netlify.app') ||
+        origin.endsWith('.onrender.com') ||
+        configuredOrigins.includes(origin)
+      ) {
+        return callback(null, true);
+      }
+      return callback(null, true);
+    },
     credentials: true,
   });
 
@@ -43,6 +61,7 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
 
   // Fail-fast: validate critical secrets at startup
+  console.log('JWT_ACCESS_SECRET:', process.env.JWT_ACCESS_SECRET ? process.env.JWT_ACCESS_SECRET.length : 'undefined');
   if (
     !process.env.JWT_ACCESS_SECRET ||
     process.env.JWT_ACCESS_SECRET.length < 32
@@ -67,6 +86,6 @@ async function bootstrap() {
   }
 
   const port = process.env.PORT ?? 3000;
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
 }
 bootstrap();

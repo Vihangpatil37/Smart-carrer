@@ -32,7 +32,6 @@ import {
 import { Button } from '../components/ui/Button';
 import { GlassCard } from '../components/ui/GlassCard';
 import { SectionReveal } from '../components/shared/SectionReveal';
-import { AmbientOrbs } from '../components/shared/AmbientOrbs';
 import { fadeUp, staggerContainer, scaleIn } from '../lib/motion';
 
 /* ── AnimatedCounter ───────────────────────────── */
@@ -349,7 +348,6 @@ export function Landing() {
 
       {/* ── HERO (Largest aurora background intensity) ── */}
       <section className="relative min-h-screen flex items-center pt-24 pb-12 overflow-hidden bg-[#05070D]">
-        <AmbientOrbs />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10 flex flex-col lg:flex-row items-center gap-12">
           <div className="flex-1 text-center lg:text-left">
             <motion.div

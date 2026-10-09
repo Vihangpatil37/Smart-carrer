@@ -38,7 +38,10 @@ describe('Security — Input Validation & Injection (e2e)', () => {
     const login = await request(app.getHttpServer())
       .post('/api/auth/login')
       .send({ email, password: 'Password1' });
-    studentToken = login.body.data.access_token;
+    if (login.status !== 200) {
+      console.log('LOGIN FAILED:', login.body);
+    }
+    studentToken = login.body.data ? login.body.data.access_token : login.body.access_token;
   });
 
   afterAll(async () => {

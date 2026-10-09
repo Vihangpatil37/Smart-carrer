@@ -61,16 +61,48 @@ export class CareersService implements OnModuleInit {
     }
 
     const count = await this.careerModel.countDocuments().exec();
-    if (count > 0) {
-      this.logger.log('Careers catalog already seeded.');
+    const categories = await this.careerModel.distinct('category_code').exec();
+    const requiredCategories = [
+      'science',
+      'commerce',
+      'arts_humanities',
+      'diploma',
+      'iti_polytechnic',
+      'vocational',
+      'government_defence',
+      'emerging_future',
+    ];
+    const hasAllCategories = requiredCategories.every((cat) =>
+      categories.includes(cat),
+    );
+
+    if (count >= 500 && hasAllCategories) {
+      this.logger.log(
+        `Careers catalog already fully seeded: ${count} careers across ${categories.length} categories.`,
+      );
       return;
     }
 
-    const catalogRoot = fs.existsSync(
-      '/app/catalogs/SCPR_Master_Career_Catalog_Part_1_Science_v2.md',
-    )
-      ? '/app/catalogs'
-      : path.resolve(__dirname, '../../../../');
+    if (count > 0 && (!hasAllCategories || count < 500)) {
+      this.logger.log(
+        `Detected incomplete catalog (${count} careers). Cleaning and re-seeding full catalog...`,
+      );
+      await this.careerModel.deleteMany({}).exec();
+    }
+
+    const candidateRoots = [
+      '/app/catalogs',
+      path.resolve(__dirname, '../../../'),
+      path.resolve(process.cwd(), '../'),
+      path.resolve(process.cwd(), '.'),
+      path.resolve(__dirname, '../../../../'),
+    ];
+    const catalogRoot =
+      candidateRoots.find((dir) =>
+        fs.existsSync(
+          path.join(dir, 'SCPR_Master_Career_Catalog_Part_1_Science_v2.md'),
+        ),
+      ) || path.resolve(__dirname, '../../../');
 
     const catalogFiles = [
       {
@@ -169,7 +201,7 @@ export class CareersService implements OnModuleInit {
     return this.careerModel
       .find(filter)
       .select(
-        '-trait_weights_draft -eligibility_draft -backfill_status -needs_enrichment -source_catalog_parts',
+        '-trait_weights_draft -eligibility_draft -backfill_status -needs_enrichment',
       )
       .exec();
   }

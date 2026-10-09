@@ -49,7 +49,7 @@ describe('API (e2e)', () => {
         .post('/api/auth/register')
         .send({ email, password: 'Password1', full_name: 'E2E User' });
       expect(reg.status).toBe(201);
-      expect(reg.body.data.email).toBe(email);
+      expect(reg.body.data.user.email).toBe(email);
 
       const login = await request(app.getHttpServer())
         .post('/api/auth/login')

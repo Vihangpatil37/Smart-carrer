@@ -24,20 +24,30 @@ export const Register = () => {
     { label: 'At least 8 characters', met: password.length >= 8 },
     { label: 'At least 1 lowercase character', met: /[a-z]/.test(password) },
     { label: 'At least 1 uppercase character', met: /[A-Z]/.test(password) },
-    { label: 'At least 1 number or special character', met: /[^a-zA-Z]/.test(password) }
+    { label: 'At least 1 number', met: /\d/.test(password) }
   ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Check if all password requirements are met
+    if (!passwordReqs.every(req => req.met)) {
+      setError('Please ensure your password meets all requirements.');
+      return;
+    }
+
     setLoading(true);
     setError(null);
     try {
       const data: any = await client.post('/auth/register', { email, password, full_name: fullName });
-      // Use the temporary setup token and go to 2FA
-      useAuthStore.getState().updateAccessToken(data.setup_token);
-      navigate('/setup-2fa');
+      useAuthStore.getState().setAuth(data.user, data.access_token, data.refresh_token);
+      navigate('/');
     } catch (err: any) {
-      setError(err.message || 'Registration failed');
+      if (err.errors && Array.isArray(err.errors)) {
+        setError(err.errors.map((e: any) => e.message).join(', '));
+      } else {
+        setError(err.message || 'Registration failed');
+      }
     } finally {
       setLoading(false);
     }
@@ -95,7 +105,7 @@ export const Register = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-black hover:text-black/80 transition-colors flex items-center justify-center"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary transition-colors flex items-center justify-center"
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>

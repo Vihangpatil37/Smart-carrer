@@ -70,7 +70,19 @@ async function bootstrap() {
   console.log('  Unified Career Catalog Seeder (Phases 1-9)');
   console.log('============================================\n');
 
-  const projectRoot = path.resolve(__dirname, '../../../../');
+  const candidateRoots = [
+    '/app/catalogs',
+    path.resolve(__dirname, '../../../../'),
+    path.resolve(process.cwd(), '../'),
+    path.resolve(process.cwd(), '.'),
+    path.resolve(__dirname, '../../../'),
+  ];
+  const projectRoot =
+    candidateRoots.find((dir) =>
+      fs.existsSync(
+        path.join(dir, 'SCPR_Master_Career_Catalog_Part_1_Science_v2.md'),
+      ),
+    ) || path.resolve(__dirname, '../../../../');
 
   // Verify all files exist before starting
   for (const phase of phases) {

@@ -244,11 +244,11 @@ export const CareerGallery: React.FC = () => {
                       </div>
                     )}
 
-                    {selectedCareer.skills_required?.length > 0 && (
+                    {((selectedCareer.skills_required && selectedCareer.skills_required.length > 0) || ((selectedCareer as any).required_skills && (selectedCareer as any).required_skills.length > 0)) && (
                       <div>
                         <h4 className="text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Skills Required</h4>
                         <div className="flex flex-wrap gap-2">
-                          {selectedCareer.skills_required.map(skill => (
+                          {(selectedCareer.skills_required?.length ? selectedCareer.skills_required : (selectedCareer as any).required_skills).map((skill: string) => (
                             <span key={skill} className="px-2.5 py-1 rounded-lg bg-white/[0.03] border border-solid border-white/[0.06] text-xs text-text-primary font-medium">
                               {skill}
                             </span>

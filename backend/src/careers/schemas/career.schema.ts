@@ -144,6 +144,18 @@ export class Career {
 
   @Prop({ required: false })
   imported_at?: Date;
+
+  @Prop({ required: false })
+  average_salary?: string;
+
+  @Prop({ required: false })
+  growth_rate?: string;
+
+  @Prop({ required: false })
+  entry_requirements?: string;
+
+  @Prop({ type: [String], required: false, default: [] })
+  skills_required?: string[];
 }
 
 export const CareerSchema: MongooseSchema =

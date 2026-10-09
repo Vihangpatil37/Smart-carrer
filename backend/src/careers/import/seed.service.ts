@@ -29,6 +29,91 @@ export interface SeedPhaseResult {
   timestamp: string;
 }
 
+function inferMetadata(
+  categoryCode: string,
+  name: string,
+  pathwayTags: string[],
+  eligibility: any,
+) {
+  const categoryLabels: Record<string, string> = {
+    science: 'Science & Technology',
+    commerce: 'Commerce & Finance',
+    arts_humanities: 'Arts & Humanities',
+    diploma: 'Engineering & Polytechnic Diploma',
+    iti_polytechnic: 'ITI Technical Trades',
+    vocational: 'Vocational Skill Development',
+    government_defence: 'Government & Defence Services',
+    emerging_future: 'Emerging & Future Technologies',
+  };
+
+  const domainLabel = categoryLabels[categoryCode] || categoryCode;
+  const pathwayText = pathwayTags.length > 0 ? ` (Pathways: ${pathwayTags.slice(0, 3).join(' > ')})` : '';
+  const description = `Professional career in ${name}${pathwayText}. Requires domain competency, practical skills, and structured education in the ${domainLabel} sector.`;
+
+  const skillsMap: Record<string, string[]> = {
+    science: ['Analytical Thinking', 'Problem Solving', 'Data Analysis', 'Technical Proficiency'],
+    commerce: ['Financial Analysis', 'Strategic Management', 'Business Analytics', 'Communication'],
+    arts_humanities: ['Critical Analysis', 'Creative Design', 'Communication', 'Research Methodology'],
+    diploma: ['Technical Operations', 'Equipment Maintenance', 'CAD/Technical Drafting', 'Safety Protocols'],
+    iti_polytechnic: ['Practical Tool Handling', 'System Installation', 'Component Repair', 'Industrial Safety'],
+    vocational: ['Applied Domain Skills', 'Customer Engagement', 'Operational Workflow', 'Quality Standards'],
+    government_defence: ['Public Administration', 'Strategic Planning', 'Leadership', 'Discipline & Ethics'],
+    emerging_future: ['Next-Gen Tech Innovation', 'AI & Digital Systems', 'Complex Problem Solving', 'Adaptability'],
+  };
+
+  const baseSkills = skillsMap[categoryCode] || ['Critical Thinking', 'Problem Solving', 'Teamwork'];
+  const skills = [...baseSkills];
+  const nameLower = name.toLowerCase();
+  if (nameLower.includes('software') || nameLower.includes('data') || nameLower.includes('developer') || nameLower.includes('engineer')) {
+    skills.push('Technical Engineering');
+  }
+  if (nameLower.includes('design')) {
+    skills.push('Visual Design');
+  }
+  if (nameLower.includes('manager') || nameLower.includes('officer')) {
+    skills.push('Team Leadership');
+  }
+
+  const salaries: Record<string, string> = {
+    science: '₹6.0 - 18.0 LPA',
+    commerce: '₹5.0 - 15.0 LPA',
+    arts_humanities: '₹4.5 - 12.0 LPA',
+    diploma: '₹3.5 - 7.5 LPA',
+    iti_polytechnic: '₹2.5 - 5.5 LPA',
+    vocational: '₹3.5 - 8.0 LPA',
+    government_defence: '₹45,000 - ₹1,25,000 / month (Pay Level 6-10)',
+    emerging_future: '₹8.0 - 25.0 LPA',
+  };
+
+  const growths: Record<string, string> = {
+    science: 'High (+18% YoY)',
+    commerce: 'Strong (+14% YoY)',
+    arts_humanities: 'Steady (+10% YoY)',
+    diploma: 'Steady Demand (+12% YoY)',
+    iti_polytechnic: 'High Demand (+15% YoY)',
+    vocational: 'Rapid Growth (+22% YoY)',
+    government_defence: 'High Stability & Security',
+    emerging_future: 'Exponential (+35% YoY)',
+  };
+
+  const streamReq = eligibility.required_stream && eligibility.required_stream !== 'any'
+    ? `${eligibility.required_stream} stream`
+    : 'Any recognized stream';
+  const duration = eligibility.min_study_duration_years
+    ? `minimum ${eligibility.min_study_duration_years} years program`
+    : 'standard certification/degree';
+
+  const entry = `Eligibility: 10th/12th qualification with ${streamReq}, followed by ${duration}.`;
+
+  return {
+    description,
+    skills,
+    average_salary: salaries[categoryCode] || '₹4.0 - 10.0 LPA',
+    growth_rate: growths[categoryCode] || 'Stable (+10% YoY)',
+    entry_requirements: entry,
+  };
+}
+
 @Injectable()
 export class CareerSeedService {
   private readonly logger = new Logger(CareerSeedService.name);
@@ -185,7 +270,6 @@ export class CareerSeedService {
           computeEligibility(categoryCode, subDomainCode);
 
         // Detect broad-degree leaves (Section 3.2 heuristic)
-        // University degrees that aren't specific job titles
         const broadDegreeKeywords = [
           'engineering',
           'bachelor',
@@ -224,17 +308,23 @@ export class CareerSeedService {
           enrichmentFlagged++;
         }
 
+        const meta = inferMetadata(categoryCode, leaf.name, leaf.pathway_tags, eligibility);
+
         const newCareer = new this.careerModel({
           career_code: leaf.career_code,
           category_code: categoryCode,
           name: leaf.name,
-          description: leaf.name, // placeholder description — admin can enrich later
-          required_skills: [] as string[],
-          technical_skills: [] as string[],
-          soft_skills: [] as string[],
-          market_demand: 'Medium',
-          future_scope: 'Stable',
-          career_progression: 'Standard progression',
+          description: meta.description,
+          required_skills: meta.skills,
+          skills_required: meta.skills,
+          technical_skills: meta.skills.slice(0, 2),
+          soft_skills: meta.skills.slice(2),
+          market_demand: categoryCode === 'emerging_future' ? 'High' : 'Medium',
+          future_scope: categoryCode === 'emerging_future' ? 'Growing' : 'Stable',
+          career_progression: 'Standard professional progression path',
+          average_salary: meta.average_salary,
+          growth_rate: meta.growth_rate,
+          entry_requirements: meta.entry_requirements,
           trait_weights: traitWeights,
           eligibility: {
             min_maths: eligibility.min_maths,
@@ -259,6 +349,7 @@ export class CareerSeedService {
         newInserts++;
       }
     }
+
 
     if (newInserts > 0) {
       this.logger.log(`Inserted ${newInserts} new careers from ${catalogPart}`);

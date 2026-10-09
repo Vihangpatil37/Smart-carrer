@@ -15,9 +15,6 @@ export class User extends Document {
   @Prop({ required: true, unique: true, index: true, lowercase: true })
   email: string;
 
-  @Prop({ required: true, default: false })
-  is_two_factor_enabled: boolean;
-
   @Prop({ required: false, select: false })
   password_hash: string;
 
@@ -40,12 +37,6 @@ export class User extends Document {
 
   @Prop({ required: false, type: Date })
   last_login?: Date;
-
-  @Prop({ required: false, select: false, get: decrypt, set: encrypt })
-  two_factor_secret?: string;
-
-  @Prop({ required: false, select: false, type: [String] })
-  recovery_codes?: string[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
