@@ -23,6 +23,9 @@ export class User extends Document {
   @Prop({ required: true, default: 'local' })
   provider: string; // "local" | etc.
 
+  @Prop({ required: true, default: false })
+  email_verified: boolean;
+
   @Prop({ required: true, default: 'student' })
   role: string; // "student" | "admin"
 
