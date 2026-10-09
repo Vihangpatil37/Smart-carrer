@@ -9,6 +9,7 @@ import {
   useMotionValue,
   animate,
   useReducedMotion,
+  useTransform,
 } from 'framer-motion';
 import {
   Menu,
@@ -116,7 +117,7 @@ const CareerOrbit = memo(() => {
       whileInView="visible"
       viewport={{ once: true }}
       transition={{ delay: 0.4 }}
-      className="orbit-container relative w-[320px] h-[320px] sm:w-[440px] sm:h-[440px] lg:w-[480px] lg:h-[480px] mx-auto lg:ml-auto lg:mr-0 flex items-center justify-center select-none"
+      className="orbit-container relative w-[320px] h-[320px] sm:w-[440px] sm:h-[440px] lg:w-[480px] lg:h-[480px] mx-auto lg:ml-auto lg:mr-0 flex items-center justify-center select-none mb-10 lg:mb-0"
     >
       {/* Central Ambient Energy Glow */}
       <div className="absolute w-48 h-48 rounded-full bg-brand/20 blur-[60px] pointer-events-none" />
@@ -137,14 +138,16 @@ const CareerOrbit = memo(() => {
       {/* Central AI Core Hub */}
       <div className="relative z-20 flex flex-col items-center justify-center pointer-events-none">
         {/* Pulsing Outer Energy Wave */}
-        <div
+        <motion.div
+          animate={{ scale: [0.95, 1.15, 0.95], opacity: [0.8, 0.2, 0.8] }}
+          transition={{ duration: 3.5, repeat: Infinity, ease: 'easeOut' }}
           className="absolute w-28 h-28 sm:w-32 sm:h-32 rounded-full border border-ai-cyan/30"
-          style={prefersReducedMotion ? undefined : { animation: 'pulse-ring 3.5s ease-out infinite' }}
         />
         {/* Rotating Dashed Compass Ring */}
-        <div
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 24, repeat: Infinity, ease: 'linear' }}
           className="absolute w-24 h-24 sm:w-28 sm:h-28 rounded-full border border-dashed border-ai-cyan/25"
-          style={prefersReducedMotion ? undefined : { animation: 'radar-sweep 24s linear infinite' }}
         />
         {/* Core Hub Center */}
         <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#0A0A0F]/95 border border-brand/45 flex flex-col items-center justify-center shadow-[0_0_35px_rgba(91,124,250,0.35)] backdrop-blur-xl">
@@ -157,13 +160,13 @@ const CareerOrbit = memo(() => {
 
       {/* Orbiting Inner Ring Chips */}
       {ORBIT_INNER_CHIPS.map((chip) => (
-        <OrbitChip key={chip.label} {...chip} prefersReducedMotion={prefersReducedMotion} />
+        <OrbitChip key={chip.label} {...chip} />
       ))}
 
-      {/* Orbiting Outer Ring Chips (Desktop & Tablet) */}
-      <div className="hidden sm:contents">
+      {/* Orbiting Outer Ring Chips (Desktop only) */}
+      <div className="hidden lg:contents">
         {ORBIT_OUTER_CHIPS.map((chip) => (
-          <OrbitChip key={chip.label} {...chip} prefersReducedMotion={prefersReducedMotion} />
+          <OrbitChip key={chip.label} {...chip} />
         ))}
       </div>
 
@@ -196,8 +199,7 @@ function OrbitChip({
   reverse,
   categoryColor,
   icon: Icon,
-  prefersReducedMotion,
-}: OrbitChipData & { prefersReducedMotion?: boolean | null }) {
+}: OrbitChipData) {
   const animationDelay = reverse
     ? `-${(((360 - angle) % 360) / 360) * 38}s`
     : `-${(angle / 360) * 28}s`;
@@ -207,18 +209,9 @@ function OrbitChip({
       className={`absolute top-1/2 left-1/2 pointer-events-auto ${
         reverse ? 'orbit-chip-outer' : 'orbit-chip-inner'
       }`}
-      style={
-        prefersReducedMotion
-          ? {
-              transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(var(${
-                reverse ? '--orbit-r, -205px' : '--orbit-r, -145px'
-              })) rotate(-${angle}deg)`,
-              animation: 'none',
-            }
-          : {
-              animationDelay,
-            }
-      }
+      style={{
+        animationDelay,
+      }}
     >
       <div
         className="group relative flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0A0A0F]/95 border border-white/[0.12] hover:border-white/40 backdrop-blur-md whitespace-nowrap shadow-[0_4px_16px_rgba(0,0,0,0.5)] transition-all duration-200 hover:scale-110 cursor-pointer"
@@ -327,10 +320,13 @@ export function Landing() {
   /* ── Journey scroll timeline ──── */
   const timelineRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(-1);
+  const [scrollPercent, setScrollPercent] = useState(0);
   const { scrollYProgress } = useScroll({ target: timelineRef, offset: ['start center', 'end center'] });
+  const sparkY = useTransform(scrollYProgress, [0, 1], ['0%', '100%']);
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
     const index = Math.floor(latest * journeySteps.length);
     setActiveIndex(Math.min(index, journeySteps.length - 1));
+    setScrollPercent(Math.min(100, Math.max(0, Math.round(latest * 100))));
   });
 
   return (
@@ -465,7 +461,7 @@ export function Landing() {
           />
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10 flex flex-col lg:flex-row items-center gap-10 lg:gap-14">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10 flex flex-col lg:flex-row items-center gap-6 lg:gap-14">
           <div className="flex-1 text-center lg:text-left">
             <motion.div
               initial={{ opacity: 0, y: 10 }}
@@ -481,8 +477,8 @@ export function Landing() {
                 Free AI Career Counseling Platform
               </span>
             </motion.div>
-            <h1 className="font-anton text-[clamp(2.4rem,5.5vw,4.2rem)] leading-[1.08] tracking-wider text-text-primary mb-5">
-              Empathetic AI Mentorship & Custom Roadmaps for Students
+            <h1 className="font-plus-jakarta font-semibold text-[clamp(2rem,6vw,4.2rem)] leading-[1.08] tracking-tight text-text-primary mb-5">
+              Empathetic AI Mentorship for Students
             </h1>
             <p className="text-base sm:text-lg text-text-secondary mb-7 max-w-xl mx-auto lg:mx-0 leading-relaxed font-normal">
               Unlock personalized path recommendations based on academic strengths and interests. Created exclusively for Indian Class 10 & 12 students.
@@ -544,7 +540,7 @@ export function Landing() {
                   idx % 2 === 0 ? 'md:border-none' : ''
                 } ${idx >= 2 ? 'md:border-l' : ''}`}
               >
-                <div className="font-anton text-2xl sm:text-3xl text-brand tracking-wider mb-2">
+                <div className="font-plus-jakarta font-bold text-2xl sm:text-3xl text-brand tracking-tight mb-2">
                   <AnimatedCounter to={stat.value} suffix={stat.suffix} />
                 </div>
                 <div className="text-text-secondary text-xs sm:text-sm text-center font-medium">
@@ -557,60 +553,177 @@ export function Landing() {
       </div>
 
       {/* ── JOURNEY ── */}
-      <section id="journey" className="py-24 relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <SectionReveal className="text-center mb-16">
-          <h2 className="font-anton text-[clamp(2rem,5vw,3.5rem)] text-text-primary tracking-wide">
+      <section id="journey" className="py-24 relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden">
+        {/* Ambient Spatial Lighting for Deep Architectural Look */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute top-[12%] -left-[10%] w-[520px] h-[520px] rounded-full bg-[radial-gradient(circle_at_center,rgba(91,124,250,0.12)_0%,transparent_70%)] blur-[100px]" />
+          <div className="absolute bottom-[10%] -right-[10%] w-[560px] h-[560px] rounded-full bg-[radial-gradient(circle_at_center,rgba(112,225,255,0.08)_0%,transparent_70%)] blur-[110px]" />
+          <div className="absolute top-[50%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(139,92,246,0.06)_0%,transparent_70%)] blur-[120px]" />
+        </div>
+
+        <SectionReveal className="text-center mb-10 sm:mb-14 relative z-10">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-brand/25 bg-brand/10 backdrop-blur-md mb-4 text-xs font-semibold text-brand tracking-wider uppercase">
+            <Sparkles className="w-3.5 h-3.5 text-ai-cyan" />
+            <span>6-Stage Discovery Framework</span>
+          </div>
+          <h2 className="font-plus-jakarta font-bold text-[clamp(2rem,5vw,3.5rem)] text-text-primary tracking-tight">
             THE GUIDANCE JOURNEY
           </h2>
+          <p className="text-text-secondary text-base sm:text-lg max-w-2xl mx-auto mt-3 font-normal leading-relaxed">
+            From self-reflection to actionable execution — structured step-by-step career navigation.
+          </p>
         </SectionReveal>
-        <div ref={timelineRef} className="relative">
-          <div className="absolute left-[24px] lg:left-1/2 top-0 bottom-0 w-[2px] bg-white/[0.05] -translate-x-1/2 rounded-full overflow-hidden">
-            <motion.div className="w-full bg-brand origin-top" style={{ scaleY: scrollYProgress }} />
+
+        {/* High-Tech dApp Telemetry HUD Scroll Progress Bar */}
+        <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between max-w-md mx-auto mb-14 px-5 py-2.5 rounded-full bg-[#0A0A0F]/90 border border-white/[0.08] backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.6)] gap-3">
+          <div className="flex items-center gap-2">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-ai-cyan opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-ai-cyan" />
+            </span>
+            <span className="text-xs font-mono text-text-secondary uppercase tracking-wider">
+              {activeIndex >= 0 ? `Stage 0${activeIndex + 1} of 06 Active` : 'Scroll to Explore Pathway'}
+            </span>
           </div>
-          <div className="flex flex-col gap-12">
+          <div className="flex items-center gap-2.5 w-full sm:w-auto">
+            <div className="w-24 h-1.5 rounded-full bg-white/[0.08] overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-brand via-ai-cyan to-brand transition-all duration-150"
+                style={{ width: `${Math.max(10, scrollPercent)}%` }}
+              />
+            </div>
+            <span className="font-mono text-[11px] font-bold text-ai-cyan">
+              {scrollPercent}%
+            </span>
+          </div>
+        </div>
+
+        <div ref={timelineRef} className="relative z-10">
+          {/* Illuminated Cyber Spine Rail */}
+          <div className="absolute left-[24px] lg:left-1/2 top-0 bottom-0 w-[2px] bg-white/[0.07] -translate-x-1/2 rounded-full overflow-hidden shadow-[0_0_12px_rgba(91,124,250,0.15)]">
+            <motion.div
+              className="w-full bg-gradient-to-b from-brand via-ai-cyan to-brand origin-top shadow-[0_0_16px_rgba(112,225,255,0.7)]"
+              style={{ scaleY: scrollYProgress }}
+            />
+          </div>
+
+          {/* Traveling Laser Spark Comet Head Following Scroll Position */}
+          <motion.div
+            style={{ top: sparkY }}
+            className="absolute left-[24px] lg:left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-ai-cyan shadow-[0_0_16px_#70E1FF,0_0_32px_#5B7CFA] pointer-events-none z-30 flex items-center justify-center"
+          >
+            <div className="w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_8px_#ffffff]" />
+          </motion.div>
+
+          <div className="flex flex-col gap-12 sm:gap-14">
             {journeySteps.map((step, index) => {
               const isActive = index <= activeIndex;
               return (
                 <div key={step.id} className="relative flex justify-start lg:justify-center w-full">
+                  {/* Concentric Architectural Milestone Beacon */}
                   <div
-                    className={`absolute left-[24px] lg:left-1/2 top-6 -translate-x-1/2 w-4 h-4 rounded-full border-2 border-[#05070D] z-20 flex items-center justify-center transition-colors duration-300 ${
-                      isActive ? 'bg-brand' : 'bg-white/[0.08]'
+                    className={`absolute left-[24px] lg:left-1/2 top-7 -translate-x-1/2 w-8 h-8 rounded-full border z-20 flex items-center justify-center transition-all duration-300 backdrop-blur-xl ${
+                      isActive
+                        ? 'border-brand/80 bg-[#05070D] shadow-[0_0_24px_rgba(91,124,250,0.7)] ring-2 ring-brand/35'
+                        : 'border-white/[0.12] bg-[#0A0A0F]/90'
                     }`}
                   >
+                    <span
+                      className={`font-mono text-[10px] font-bold transition-colors ${
+                        isActive ? 'text-ai-cyan' : 'text-text-muted'
+                      }`}
+                    >
+                      0{step.id}
+                    </span>
                     {isActive && (
                       <motion.div
                         layoutId="pulse"
-                        className="absolute inset-0 bg-brand rounded-full opacity-40"
-                        animate={prefersReducedMotion ? {} : { scale: [1, 2, 1], opacity: [0.4, 0, 0.4] }}
-                        transition={{ duration: 2.8, repeat: Infinity }}
+                        className="absolute inset-0 rounded-full border border-ai-cyan/60"
+                        animate={prefersReducedMotion ? {} : { scale: [1, 1.8, 1], opacity: [0.7, 0, 0.7] }}
+                        transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
                       />
                     )}
                   </div>
+
+                  {/* Desktop Horizontal Circuit Trace Connector */}
                   <div
-                    className={`w-full pl-14 lg:pl-0 flex ${
+                    className={`hidden lg:block absolute top-[43px] w-14 h-[1px] transition-all duration-500 ${
+                      index % 2 === 0
+                        ? 'right-1/2 mr-4 bg-gradient-to-l'
+                        : 'left-1/2 ml-4 bg-gradient-to-r'
+                    } ${
+                      isActive
+                        ? 'from-ai-cyan via-brand to-transparent shadow-[0_0_10px_#70E1FF]'
+                        : 'from-white/[0.08] to-transparent'
+                    }`}
+                  />
+
+                  {/* Step Card Container */}
+                  <div
+                    className={`w-full pl-14 sm:pl-16 lg:pl-0 flex ${
                       index % 2 === 0 ? 'lg:justify-end lg:pr-12' : 'lg:justify-start lg:pl-12'
                     }`}
                   >
                     <motion.div variants={fadeUp} className="relative z-10 w-full lg:w-1/2">
                       <GlassCard
                         elevation={2}
-                        className={`transition-all duration-300 hover:-translate-y-0.5 group relative overflow-hidden ${
-                          isActive ? 'bg-white/[0.08] border-brand/30' : ''
+                        className={`transition-all duration-300 hover:-translate-y-1 group relative overflow-hidden rounded-[24px] border ${
+                          isActive
+                            ? 'bg-[#0A0A0F]/95 border-brand/40 shadow-[0_16px_40px_rgba(91,124,250,0.22)]'
+                            : 'border-white/[0.08] hover:border-white/20 bg-[#0A0A0F]/70'
                         }`}
                       >
-                        <div className="flex items-start gap-4 p-6 relative z-10">
-                          <div className="w-12 h-12 rounded-full bg-brand/10 border border-brand/20 flex items-center justify-center shrink-0">
+                        {/* Top Laser Accent Beam on Active Card */}
+                        {isActive && (
+                          <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-ai-cyan to-transparent animate-pulse" />
+                        )}
+
+                        {/* Ambient Corner Light Wash */}
+                        <div
+                          className={`absolute top-0 right-0 w-44 h-44 rounded-full pointer-events-none transition-opacity duration-500 blur-[50px] ${
+                            isActive
+                              ? 'bg-brand/15 opacity-100'
+                              : 'bg-transparent opacity-0 group-hover:opacity-60 group-hover:bg-brand/10'
+                          }`}
+                        />
+
+                        {/* Background Architectural Ghost Numeral */}
+                        <div className="absolute right-4 bottom-2 font-mono text-6xl font-black text-white/[0.025] select-none pointer-events-none tracking-tighter">
+                          0{step.id}
+                        </div>
+
+                        <div className="flex items-start gap-4 sm:gap-5 p-6 sm:p-7 relative z-10">
+                          {/* Elevated Double-Rim Icon Medallion */}
+                          <div
+                            className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center shrink-0 border transition-all duration-300 ${
+                              isActive
+                                ? 'bg-brand/15 border-brand/40 shadow-[0_0_20px_rgba(91,124,250,0.3)] text-brand'
+                                : 'bg-white/[0.04] border-white/[0.08] group-hover:bg-brand/10 group-hover:border-brand/20 text-brand'
+                            }`}
+                          >
                             <step.icon
-                              size={22}
-                              className="text-brand group-hover:scale-105 transition-transform duration-180"
+                              size={24}
+                              className="transition-transform duration-300 group-hover:scale-110"
                             />
                           </div>
-                          <div>
-                            <div className="font-semibold text-brand text-xs uppercase tracking-wider mb-1">
-                              STEP {step.id}
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-brand/10 border border-brand/20 text-brand text-[0.68rem] font-mono uppercase tracking-wider font-semibold">
+                                <span>STAGE 0{step.id}</span>
+                              </div>
+                              {isActive && (
+                                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-ai-cyan/15 border border-ai-cyan/35 text-ai-cyan text-[0.65rem] font-mono font-semibold tracking-wider animate-pulse">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-ai-cyan" />
+                                  <span>IN FOCUS</span>
+                                </div>
+                              )}
                             </div>
-                            <h3 className="font-semibold text-text-primary text-lg mb-2">{step.title}</h3>
-                            <p className="text-text-secondary text-sm leading-relaxed">{step.desc}</p>
+                            <h3 className="font-plus-jakarta font-bold text-text-primary text-lg sm:text-xl mb-2 tracking-tight">
+                              {step.title}
+                            </h3>
+                            <p className="text-text-secondary text-sm sm:text-[0.92rem] leading-relaxed">
+                              {step.desc}
+                            </p>
                           </div>
                         </div>
                       </GlassCard>
@@ -626,7 +739,7 @@ export function Landing() {
       {/* ── LIVE INTERACTIVE PIPELINE (Student → AI → Recommendation → Roadmap) ── */}
       <section id="preview" className="py-24 relative z-10 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto border-t border-white/[0.06]">
         <SectionReveal className="text-center mb-12">
-          <h2 className="font-anton text-[clamp(2rem,5vw,3.5rem)] text-text-primary tracking-wide mb-4">
+          <h2 className="font-plus-jakarta font-bold text-[clamp(2rem,5vw,3.5rem)] text-text-primary tracking-tight mb-4">
             HOW IT WORKS
           </h2>
           <p className="text-text-secondary text-base sm:text-lg max-w-2xl mx-auto">
@@ -724,7 +837,7 @@ export function Landing() {
                   <div className="bg-white/[0.03] border border-white/[0.06] rounded-[18px] p-5 space-y-4">
                     <div className="flex items-start gap-3">
                       <div className="w-8 h-8 rounded-full bg-brand/10 flex items-center justify-center shrink-0">
-                        <span className="font-anton text-brand text-xs">AI</span>
+                        <span className="font-plus-jakarta font-bold text-brand text-xs tracking-tight">AI</span>
                       </div>
                       <p className="text-sm text-text-primary leading-relaxed">
                         "Based on your Class 12 PCM stream, the Academic Suitability score is highly aligned. Your passion for visual design matches interest vectors in digital production and human-centered technology. I am scoring 150+ paths..."
@@ -754,7 +867,7 @@ export function Landing() {
                       <span className="text-xs text-text-secondary uppercase font-semibold">Top Recommendation Match</span>
                       <h4 className="text-2xl font-bold text-text-primary mt-1">UX DESIGNER</h4>
                     </div>
-                    <div className="text-2xl font-anton text-brand">94% MATCH</div>
+                    <div className="text-2xl font-plus-jakarta font-bold tracking-tight text-brand">94% MATCH</div>
                   </div>
                   <div className="w-full h-2.5 bg-white/[0.05] rounded-full overflow-hidden mb-6">
                     <div className="h-full bg-brand rounded-full" style={{ width: '94%' }} />
@@ -814,7 +927,7 @@ export function Landing() {
       {/* ── CAREER UNIVERSE ── */}
       <section id="careers" className="py-24 relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <SectionReveal className="text-center mb-16">
-          <h2 className="font-anton text-[clamp(2rem,5vw,3.5rem)] text-text-primary tracking-wide mb-4">
+          <h2 className="font-plus-jakarta font-bold text-[clamp(2rem,5vw,3.5rem)] text-text-primary tracking-tight mb-4">
             CAREER CATALOG
           </h2>
           <p className="text-text-secondary text-base sm:text-lg max-w-2xl mx-auto">
@@ -839,7 +952,7 @@ export function Landing() {
       {/* ── WHY SCPR (Asymmetric Feature Grid) ── */}
       <section className="py-24 relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/[0.06]">
         <SectionReveal className="text-center mb-16">
-          <h2 className="font-anton text-[clamp(2rem,5vw,3.5rem)] text-text-primary tracking-wide">
+          <h2 className="font-plus-jakarta font-bold text-[clamp(2rem,5vw,3.5rem)] text-text-primary tracking-tight">
             DESIGNED FOR SUCCESS
           </h2>
         </SectionReveal>
@@ -874,30 +987,37 @@ export function Landing() {
         </motion.div>
       </section>
 
-      {/* ── STUDENT STORIES ── */}
+      {/* ── STUDENT STORIES (Seamless Right-to-Left Infinite Loop) ── */}
       <section className="py-24 relative z-10 overflow-hidden border-t border-white/[0.06]">
-        <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        {/* Soft Ambient Background Lighting */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[720px] h-[360px] bg-brand/5 blur-[120px] pointer-events-none rounded-full" />
+
+        <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative z-10">
           <SectionReveal className="text-center mb-16">
-            <h2 className="font-anton text-[clamp(2rem,5vw,3.5rem)] text-text-primary tracking-wide mb-4">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-brand/25 bg-brand/10 backdrop-blur-md mb-4 text-xs font-semibold text-brand tracking-wider uppercase">
+              <Sparkles className="w-3.5 h-3.5 text-ai-cyan" />
+              <span>Student Success In Action</span>
+            </div>
+            <h2 className="font-plus-jakarta font-bold text-[clamp(2rem,5vw,3.5rem)] text-text-primary tracking-tight mb-4">
               STUDENT STORIES
             </h2>
-            <p className="text-text-secondary text-base sm:text-lg">
-              Empowering students across high schools and junior colleges.
+            <p className="text-text-secondary text-base sm:text-lg max-w-2xl mx-auto">
+              Empowering students across high schools and junior colleges with clarity and confidence.
             </p>
           </SectionReveal>
         </div>
-        <div className="relative w-full max-w-[100vw] overflow-hidden group">
-          <div className="flex md:w-max overflow-x-auto snap-x snap-mandatory hide-scrollbar md:animate-scroll md:hover:[animation-play-state:paused] gap-6 px-4 md:px-0">
-            <div className="flex gap-6 shrink-0 pr-6 md:pr-0">
-              {stories.map((s, idx) => (
-                <StoryCard key={`a-${idx}`} {...s} />
-              ))}
-            </div>
-            <div className="hidden md:flex gap-6 shrink-0">
-              {stories.map((s, idx) => (
-                <StoryCard key={`b-${idx}`} {...s} />
-              ))}
-            </div>
+
+        {/* Endless Marquee Loop Right-to-Left Container */}
+        <div className="relative w-full max-w-[100vw] overflow-hidden group py-4">
+          {/* Left & Right Cinematic Vignette Fades */}
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-36 bg-gradient-to-r from-[#05070D] to-transparent z-20" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-36 bg-gradient-to-l from-[#05070D] to-transparent z-20" />
+
+          {/* Marquee Track with Dual Duplicated Sets for Perfect Infinite Motion */}
+          <div className="animate-marquee flex gap-6">
+            {[...stories, ...stories].map((s, idx) => (
+              <StoryCard key={`story-${idx}`} {...s} />
+            ))}
           </div>
         </div>
       </section>
@@ -905,7 +1025,7 @@ export function Landing() {
       {/* ── ABOUT ── */}
       <section id="about" className="py-24 relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/[0.06]">
         <SectionReveal className="text-center mb-16">
-          <h2 className="font-anton text-[clamp(2rem,5vw,3.5rem)] text-text-primary tracking-wide mb-6">
+          <h2 className="font-plus-jakarta font-bold text-[clamp(2rem,5vw,3.5rem)] text-text-primary tracking-tight mb-6">
             ABOUT SCPR
           </h2>
           <p className="text-text-secondary text-base sm:text-lg max-w-3xl mx-auto leading-relaxed">
@@ -939,7 +1059,7 @@ export function Landing() {
       {/* ── CTA ── */}
       <section className="relative min-h-[50vh] flex flex-col items-center justify-center py-24 overflow-hidden border-t border-white/[0.06]">
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto w-full">
-          <h2 className="font-anton text-[clamp(2.5rem,8vw,5rem)] uppercase text-text-primary leading-[1.1] tracking-wider mb-6">
+          <h2 className="font-plus-jakarta font-bold text-[clamp(2.5rem,8vw,5rem)] uppercase text-text-primary leading-[1.1] tracking-tight mb-6">
             BEGIN YOUR PATH FINDING
           </h2>
           <p className="text-text-secondary text-base sm:text-lg mb-10 max-w-xl mx-auto">
@@ -1127,7 +1247,7 @@ function CareerCardInline({
       >
         <div className="flex flex-col h-full justify-between">
           <div>
-            <h3 className="font-anton text-[1.3rem] tracking-wide mb-4" style={{ color }}>
+            <h3 className="font-plus-jakarta font-bold text-[1.3rem] tracking-tight mb-4" style={{ color }}>
               {title}
             </h3>
             <div className="space-y-3 mb-6">
@@ -1192,29 +1312,37 @@ function StoryCard({
   quote: string;
 }) {
   return (
-    <div className="w-[85vw] sm:w-[400px] shrink-0 snap-start">
-      <GlassCard elevation={2} className="h-full flex flex-col p-8 rounded-[24px]">
-        <div className="flex items-center gap-4 mb-6">
-          <div className="w-14 h-14 rounded-full bg-brand/10 flex items-center justify-center text-[1.8rem] shrink-0">
+    <div className="w-[300px] sm:w-[380px] shrink-0">
+      <GlassCard
+        elevation={2}
+        className="h-full flex flex-col p-7 sm:p-8 rounded-[24px] border border-white/[0.08] hover:border-brand/40 transition-all duration-300 relative group overflow-hidden bg-[#0A0A0F]/85 backdrop-blur-xl"
+      >
+        {/* Subtle Ambient Hover Glow */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-brand/10 rounded-full blur-[40px] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+        <div className="flex items-center gap-4 mb-6 relative z-10">
+          <div className="w-13 h-13 rounded-2xl bg-brand/10 border border-brand/20 flex items-center justify-center text-[1.7rem] shrink-0 shadow-[0_0_15px_rgba(91,124,250,0.15)]">
             {avatar}
           </div>
           <div>
-            <h4 className="font-semibold text-text-primary text-lg leading-tight">{name}</h4>
-            <p className="text-text-secondary text-sm">{location}</p>
+            <h4 className="font-plus-jakarta font-bold text-text-primary text-base sm:text-lg leading-tight tracking-tight">
+              {name}
+            </h4>
+            <p className="text-text-secondary text-xs sm:text-sm mt-0.5">{location}</p>
           </div>
           <div className="ml-auto">
-            <span className="px-3.5 py-1 bg-brand/10 border border-brand/20 text-brand text-[0.7rem] rounded-full uppercase tracking-wider font-semibold">
+            <span className="px-3 py-1 bg-brand/10 border border-brand/20 text-brand text-[0.68rem] font-mono rounded-full uppercase tracking-wider font-semibold">
               {stream}
             </span>
           </div>
         </div>
-        <blockquote className="flex-1 mb-8">
-          <p className="text-text-secondary text-base italic leading-relaxed">
+        <blockquote className="flex-1 mb-6 relative z-10">
+          <p className="text-text-secondary text-sm sm:text-[0.95rem] italic leading-relaxed">
             &ldquo;{quote}&rdquo;
           </p>
         </blockquote>
-        <div className="pt-4 border-t border-white/10 mt-auto">
-          <p className="text-sm text-text-secondary">
+        <div className="pt-4 border-t border-white/[0.08] mt-auto relative z-10">
+          <p className="text-xs sm:text-sm text-text-secondary">
             Recommended: <span className="text-brand font-semibold ml-1">{recommendation}</span>
           </p>
         </div>
@@ -1260,3 +1388,4 @@ function LinkedinIcon() {
     </svg>
   );
 }
+

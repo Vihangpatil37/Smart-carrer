@@ -104,7 +104,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *:not(.animate-marquee):not(.orbit-chip-inner):not(.orbit-chip-outer),
+  *:not(.animate-marquee):not(.orbit-chip-inner):not(.orbit-chip-outer)::before,
+  *:not(.animate-marquee):not(.orbit-chip-inner):not(.orbit-chip-outer)::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
@@ -197,3 +199,20 @@
 @media (min-width: 768px) {
   .md\:animate-scroll { animation: scroll 30s linear infinite; }
 }
+
+@keyframes marquee {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 32s linear infinite;
+}
+
+.animate-marquee:hover,
+.animate-marquee:focus-within {
+  animation-play-state: paused;
+}
+
