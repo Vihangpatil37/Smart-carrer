@@ -28,6 +28,15 @@ import {
   Mail,
   ArrowRight,
   Eye,
+  Code2,
+  Activity,
+  Palette,
+  Award,
+  Cpu,
+  Compass,
+  Layers,
+  Shield,
+  Lock,
 } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { GlassCard } from '../components/ui/GlassCard';
@@ -74,6 +83,30 @@ function AnimatedCounter({
 }
 
 /* ── CareerOrbit ────────────────────────────────── */
+interface OrbitChipData {
+  label: string;
+  angle: number;
+  reverse?: boolean;
+  categoryColor: string;
+  icon: typeof Brain;
+}
+
+const ORBIT_INNER_CHIPS: OrbitChipData[] = [
+  { label: 'Software Engineer', angle: 0, categoryColor: '#3B82F6', icon: Code2 },
+  { label: 'Medical Researcher', angle: 60, categoryColor: '#22C55E', icon: Activity },
+  { label: 'UX Designer', angle: 120, categoryColor: '#F97316', icon: Palette },
+  { label: 'IAS Officer', angle: 180, categoryColor: '#94A3B8', icon: Award },
+  { label: 'Data Scientist', angle: 240, categoryColor: '#8B5CF6', icon: Cpu },
+  { label: 'Pilot', angle: 300, categoryColor: '#EF4444', icon: Compass },
+];
+
+const ORBIT_OUTER_CHIPS: OrbitChipData[] = [
+  { label: 'Architect', angle: 0, categoryColor: '#06B6D4', icon: Layers, reverse: true },
+  { label: 'Defense Officer', angle: 90, categoryColor: '#DC2626', icon: Shield, reverse: true },
+  { label: 'Cybersecurity', angle: 180, categoryColor: '#3B82F6', icon: Lock, reverse: true },
+  { label: 'Creative Director', angle: 270, categoryColor: '#EC4899', icon: Sparkles, reverse: true },
+];
+
 const CareerOrbit = memo(() => {
   const prefersReducedMotion = useReducedMotion();
   return (
@@ -83,60 +116,124 @@ const CareerOrbit = memo(() => {
       whileInView="visible"
       viewport={{ once: true }}
       transition={{ delay: 0.4 }}
-      className="relative w-[300px] h-[300px] md:w-[420px] md:h-[420px] mx-auto lg:ml-auto lg:mr-0 flex items-center justify-center pointer-events-none"
+      className="orbit-container relative w-[320px] h-[320px] sm:w-[440px] sm:h-[440px] lg:w-[480px] lg:h-[480px] mx-auto lg:ml-auto lg:mr-0 flex items-center justify-center select-none"
     >
-      <div className="relative z-10 w-20 h-20 md:w-24 md:h-24 rounded-full bg-[#0A0A0F] border border-white/[0.08] flex items-center justify-center shadow-xl">
-        <Brain className="h-10 w-10 text-brand" />
-      </div>
+      {/* Central Ambient Energy Glow */}
+      <div className="absolute w-48 h-48 rounded-full bg-brand/20 blur-[60px] pointer-events-none" />
+
+      {/* Orbit Track 1 (Inner) - Static circular guide */}
       <div
-        className="absolute inset-0 border border-white/[0.05] rounded-full"
-        style={prefersReducedMotion ? undefined : { animation: 'orbit 25s linear infinite' }}
-      >
-        {[
-          { label: 'Software Engineer', angle: 0 },
-          { label: 'Medical Researcher', angle: 60 },
-          { label: 'UX Designer', angle: 120 },
-          { label: 'IAS Officer', angle: 180 },
-          { label: 'Data Scientist', angle: 240 },
-          { label: 'Pilot', angle: 300 },
-        ].map((c) => (
-          <OrbitChip key={c.label} {...c} />
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[240px] h-[240px] sm:w-[290px] sm:h-[290px] rounded-full border border-brand/20 pointer-events-none"
+        style={{
+          boxShadow: 'inset 0 0 24px rgba(91, 124, 250, 0.08), 0 0 20px rgba(91, 124, 250, 0.05)',
+        }}
+      />
+
+      {/* Orbit Track 2 (Outer) - Static dashed guide */}
+      <div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] h-[340px] sm:w-[410px] sm:h-[410px] rounded-full border border-dashed border-white/[0.08] pointer-events-none hidden sm:block"
+      />
+
+      {/* Central AI Core Hub */}
+      <div className="relative z-20 flex flex-col items-center justify-center pointer-events-none">
+        {/* Pulsing Outer Energy Wave */}
+        <div
+          className="absolute w-28 h-28 sm:w-32 sm:h-32 rounded-full border border-ai-cyan/30"
+          style={prefersReducedMotion ? undefined : { animation: 'pulse-ring 3.5s ease-out infinite' }}
+        />
+        {/* Rotating Dashed Compass Ring */}
+        <div
+          className="absolute w-24 h-24 sm:w-28 sm:h-28 rounded-full border border-dashed border-ai-cyan/25"
+          style={prefersReducedMotion ? undefined : { animation: 'radar-sweep 24s linear infinite' }}
+        />
+        {/* Core Hub Center */}
+        <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#0A0A0F]/95 border border-brand/45 flex flex-col items-center justify-center shadow-[0_0_35px_rgba(91,124,250,0.35)] backdrop-blur-xl">
+          <Brain className="h-8 w-8 sm:h-9 sm:w-9 text-brand drop-shadow-[0_0_12px_rgba(91,124,250,0.8)]" />
+          <span className="text-[9px] font-mono tracking-widest text-ai-cyan font-semibold mt-1">
+            AI CORE
+          </span>
+        </div>
+      </div>
+
+      {/* Orbiting Inner Ring Chips */}
+      {ORBIT_INNER_CHIPS.map((chip) => (
+        <OrbitChip key={chip.label} {...chip} prefersReducedMotion={prefersReducedMotion} />
+      ))}
+
+      {/* Orbiting Outer Ring Chips (Desktop & Tablet) */}
+      <div className="hidden sm:contents">
+        {ORBIT_OUTER_CHIPS.map((chip) => (
+          <OrbitChip key={chip.label} {...chip} prefersReducedMotion={prefersReducedMotion} />
         ))}
       </div>
-      <div
-        className="absolute inset-[-40px] md:inset-[-60px] border border-white/[0.03] rounded-full hidden sm:block"
-        style={prefersReducedMotion ? undefined : { animation: 'orbit-reverse 35s linear infinite' }}
+
+      {/* Floating Live Match Insight Badge */}
+      <motion.div
+        animate={prefersReducedMotion ? {} : { y: [0, -6, 0] }}
+        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+        className="absolute -bottom-8 sm:-bottom-10 left-1/2 -translate-x-1/2 sm:left-2 sm:translate-x-0 z-30 pointer-events-auto"
       >
-        {[
-          { label: 'Architect', angle: 0 },
-          { label: 'Defense Officer', angle: 90 },
-          { label: 'Cybersecurity', angle: 180 },
-          { label: 'Creative Director', angle: 270 },
-        ].map((c) => (
-          <OrbitChip key={c.label} {...c} reverse />
-        ))}
-      </div>
+        <div className="flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-[#0A0A0F]/95 border border-brand/35 backdrop-blur-md shadow-[0_8px_25px_rgba(0,0,0,0.7)]">
+          <div className="w-6 h-6 rounded-lg bg-brand/15 border border-brand/30 flex items-center justify-center text-brand">
+            <Sparkles className="h-3.5 w-3.5 text-ai-cyan" />
+          </div>
+          <div className="flex flex-col text-left">
+            <div className="text-[10px] text-text-muted font-medium">Smart AI Matching</div>
+            <div className="text-xs font-semibold text-text-primary flex items-center gap-1.5">
+              <span>96% Pathway Match</span>
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400" />
+            </div>
+          </div>
+        </div>
+      </motion.div>
     </motion.div>
   );
 });
 
-function OrbitChip({ label, angle, reverse }: { label: string; angle: number; reverse?: boolean }) {
+function OrbitChip({
+  label,
+  angle,
+  reverse,
+  categoryColor,
+  icon: Icon,
+  prefersReducedMotion,
+}: OrbitChipData & { prefersReducedMotion?: boolean | null }) {
+  const animationDelay = reverse
+    ? `-${(((360 - angle) % 360) / 360) * 38}s`
+    : `-${(angle / 360) * 28}s`;
+
   return (
     <div
-      className="absolute top-1/2 left-1/2 pointer-events-auto"
-      style={{
-        transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(-50%) translateY(${
-          reverse ? '-220px' : '-160px'
-        })`,
-      }}
+      className={`absolute top-1/2 left-1/2 pointer-events-auto ${
+        reverse ? 'orbit-chip-outer' : 'orbit-chip-inner'
+      }`}
+      style={
+        prefersReducedMotion
+          ? {
+              transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(var(${
+                reverse ? '--orbit-r, -205px' : '--orbit-r, -145px'
+              })) rotate(-${angle}deg)`,
+              animation: 'none',
+            }
+          : {
+              animationDelay,
+            }
+      }
     >
       <div
-        className={reverse ? 'chip-counter-rotate-reverse' : 'chip-counter-rotate'}
-        style={{ animationDelay: `-${(angle / 360) * (reverse ? 35 : 25)}s` }}
+        className="group relative flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0A0A0F]/95 border border-white/[0.12] hover:border-white/40 backdrop-blur-md whitespace-nowrap shadow-[0_4px_16px_rgba(0,0,0,0.5)] transition-all duration-200 hover:scale-110 cursor-pointer"
+        style={{
+          borderColor: `${categoryColor}50`,
+        }}
       >
-        <div className="px-3.5 py-1.5 rounded-full bg-white/[0.05] border border-white/[0.08] backdrop-blur-md whitespace-nowrap shadow-sm">
-          <span className="text-[0.7rem] font-semibold text-text-secondary">{label}</span>
-        </div>
+        <span
+          className="w-1.5 h-1.5 rounded-full shrink-0 transition-transform group-hover:scale-125"
+          style={{ backgroundColor: categoryColor, boxShadow: `0 0 8px ${categoryColor}` }}
+        />
+        <Icon className="h-3 w-3 shrink-0" style={{ color: categoryColor }} />
+        <span className="text-[0.72rem] font-medium text-text-primary group-hover:text-white transition-colors">
+          {label}
+        </span>
       </div>
     </div>
   );
