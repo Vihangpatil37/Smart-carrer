@@ -4,6 +4,7 @@ import {
   ArgumentsHost,
   HttpException,
   HttpStatus,
+  Logger,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { randomUUID } from 'crypto';
@@ -15,6 +16,8 @@ export interface FieldError {
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
+  private readonly logger = new Logger(HttpExceptionFilter.name);
+
   catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
@@ -58,14 +61,28 @@ export class HttpExceptionFilter implements ExceptionFilter {
         message = exception.message || String(resContent);
       }
     } else if (exception instanceof Error) {
-      message = exception.message;
+      message =
+        process.env.NODE_ENV === 'production'
+          ? 'Internal server error'
+          : exception.message;
       // ponytail: never expose stack traces to client in prod/test
       detail =
         process.env.NODE_ENV === 'development'
           ? exception.stack
           : undefined;
     } else {
-      message = String(exception);
+      message =
+        process.env.NODE_ENV === 'production'
+          ? 'Internal server error'
+          : String(exception);
+    }
+
+    if (status >= 500) {
+      this.logger.error(
+        `[${requestId}] ${request.method} ${request.url} 500 Internal Error: ${
+          exception instanceof Error ? exception.stack : exception
+        }`,
+      );
     }
 
     // Support both camelCase and snake_case to be fully compliant with both spec rules

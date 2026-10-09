@@ -28,9 +28,18 @@ import { RolesGuard } from './common/guards/roles.guard';
     ]),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        uri: configService.get<string>('MONGODB_URI') || 'mongodb://localhost:27017/scpr',
-      }),
+      useFactory: async (configService: ConfigService) => {
+        const uri = configService.get<string>('MONGODB_URI');
+        if (!uri) {
+          if (process.env.NODE_ENV !== 'production') {
+            return { uri: 'mongodb://localhost:27017/scpr' };
+          }
+          throw new Error(
+            'FATAL: MONGODB_URI environment variable must be set in production.',
+          );
+        }
+        return { uri };
+      },
       inject: [ConfigService],
     }),
     AuthModule,

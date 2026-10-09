@@ -45,10 +45,12 @@ export class AuthService {
 
     await user.save();
     const tokens = await this.generateTokens(user);
+    const sanitized = this.sanitizeUser(user);
 
     return {
+      ...sanitized,
       message: 'Registration successful',
-      user: this.sanitizeUser(user),
+      user: sanitized,
       ...tokens,
     };
   }
@@ -141,15 +143,15 @@ export class AuthService {
     };
   }
 
-  sanitizeUser(user: any) {
+  sanitizeUser(user: User) {
     return {
       user_id: user.user_id,
       email: user.email,
       full_name: user.full_name,
       role: user.role,
-      is_two_factor_enabled: user.is_two_factor_enabled,
-      created_at: user.created_at || (user.get && user.get('created_at')),
-      updated_at: user.updated_at || (user.get && user.get('updated_at')),
+      email_verified: (user as any).email_verified ?? false,
+      created_at: (user as any).created_at || (user.get && user.get('created_at')),
+      updated_at: (user as any).updated_at || (user.get && user.get('updated_at')),
     };
   }
 }

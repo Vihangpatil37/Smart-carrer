@@ -11,6 +11,14 @@ const getKey = (): Buffer => {
     }
     throw new Error('FATAL: DB_ENCRYPTION_KEY environment variable is missing.');
   }
+  if (!/^[0-9a-fA-F]{64}$/.test(key)) {
+    if (process.env.NODE_ENV === 'test') {
+      return Buffer.alloc(32, 0);
+    }
+    throw new Error(
+      'FATAL: DB_ENCRYPTION_KEY must be a valid 64-character hexadecimal string.',
+    );
+  }
   return Buffer.from(key, 'hex');
 };
 
@@ -35,6 +43,9 @@ export function encrypt(text: string | null | undefined): string | null | undefi
     return iv.toString('hex') + ':' + encrypted;
   } catch (error) {
     console.error('Encryption failed:', error);
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('Encryption failed for sensitive field');
+    }
     return text;
   }
 }
