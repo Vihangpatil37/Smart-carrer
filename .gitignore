@@ -52,6 +52,7 @@ temp_extract/
 temp_ref/
 screencapture-*.pdf
 screencapture-*.png
+.playwright-mcp/
 start.bat
 
 # TypeScript
