@@ -56,6 +56,8 @@
 
   --font-geist: "Geist", "Inter", sans-serif;
   --font-inter: "Inter", sans-serif;
+  --font-anton: "Anton", sans-serif;
+  --font-plus-jakarta: "Plus Jakarta Sans", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
 
   /* Backward Compatibility Aliases for migration phase */
@@ -135,16 +137,56 @@
 ::-webkit-scrollbar-thumb:hover { background: var(--color-brand); }
 * { scrollbar-width: thin; scrollbar-color: var(--color-glass-elevated) var(--color-bg-primary); }
 
-@keyframes orbit {
+/* True Orbit: revolves around AI Core while chips stay 100% upright */
+@keyframes orbit-cw {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg) translateY(var(--orbit-r, -145px)) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg) translateY(var(--orbit-r, -145px)) rotate(-360deg);
+  }
+}
+
+@keyframes orbit-ccw {
+  0% {
+    transform: translate(-50%, -50%) rotate(360deg) translateY(var(--orbit-r, -205px)) rotate(-360deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(0deg) translateY(var(--orbit-r, -205px)) rotate(0deg);
+  }
+}
+
+.orbit-chip-inner {
+  --orbit-r: -120px;
+  animation: orbit-cw 28s linear infinite;
+}
+
+@media (min-width: 640px) {
+  .orbit-chip-inner {
+    --orbit-r: -145px;
+  }
+}
+
+.orbit-chip-outer {
+  --orbit-r: -205px;
+  animation: orbit-ccw 38s linear infinite;
+}
+
+.orbit-container:hover .orbit-chip-inner,
+.orbit-container:hover .orbit-chip-outer {
+  animation-play-state: paused !important;
+}
+
+@keyframes radar-sweep {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
-@keyframes orbit-reverse {
-  from { transform: rotate(360deg); }
-  to { transform: rotate(0deg); }
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.15); opacity: 0.2; }
+  100% { transform: scale(0.95); opacity: 0.8; }
 }
-.chip-counter-rotate { animation: orbit-reverse 18s linear infinite; }
-.chip-counter-rotate-reverse { animation: orbit 28s linear infinite; }
 
 @keyframes scroll {
   0% { transform: translateX(0); }
