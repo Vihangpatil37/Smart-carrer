@@ -80,9 +80,10 @@ async function bootstrap() {
         return callback(null, true);
       }
 
-      // Allow production frontend host on Render or configured FRONTEND_URL
+      // Allow production frontend host on Render, Vercel, or configured FRONTEND_URL
       if (
         origin === 'https://scpr-frontend.onrender.com' ||
+        origin === 'https://smart-carrer-path.vercel.app' ||
         (process.env.FRONTEND_URL &&
           (origin === process.env.FRONTEND_URL ||
             origin === process.env.FRONTEND_URL.replace(/\/$/, '')))
